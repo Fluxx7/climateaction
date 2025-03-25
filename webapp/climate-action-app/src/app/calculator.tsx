@@ -1,50 +1,41 @@
 "use client";
 
-export default function calculate(electricityUsageKWh : number, transportationUsageGallonsPerMonth : number, shortFlight : number, longFlight : number, dietaryChoice : number, ) {
-  
-      // Constants for emission factors and conversion factors
-      const electricityFactor = 0.3978; 
-      const transportationFactor = 9.087; 
-      const shortFlightFactor = 100; 
-      const longFlightFactor = 300; 
-      const dietaryFactors = [200, 400, 800]; // vegan, vegetarian, non-vegetarian
+const calcFunctions: {[name: string]: (input: number) => number} = {
+    "elecUsage": (input) => yearlyEmissionsGeneric(input, 0.3978), 
+    "transitUsage": (input) => yearlyEmissionsGeneric(input, 9.087),
+    "shortFlights": (input) => input*100,
+    "longFlights": (input) => input*300,
+    "dietChoice": dietaryChoice,
+};
 
-      const year = 12
-  
-      // Calculate CO2 emissions for electricity and transportation
-      const electricityEmissions = electricityUsageKWh * electricityFactor;
-      const transportationEmissions = transportationUsageGallonsPerMonth * transportationFactor;
+export default function calculate(calcArray: [number, string][]) {
+    let total = 0;
+    let result: [key: string, value: number][] = calcArray.map((element) => {
+        if (!(element[1] in calcFunctions)) {
+            throw new Error("Undefined operation '" + element[1] + "' attempted");
+        }
+        let output = calcFunctions[element[1]](element[0]);
+        total += output;
+        return [element[1], output]
+    });
+    result.push(["TOTAL", total]);
+    return result;
+}
 
-      // Calculate air travel emissions for each type of flight
-      const airTravelEmissionsShortHaul = shortFlight * shortFlightFactor;
-      const airTravelEmissionsLongHaul = longFlight * longFlightFactor;
+function yearlyEmissionsGeneric(inputMonthly:number, factor:number) : number {
+    return inputMonthly*factor*12;
+}
 
-      // Calculate dietary choice emissions
-      const dietaryChoiceEmissions = dietaryFactors[dietaryChoice] || 0; 
-
-      // Calculate total air travel emissions
-      const totalAirTravelEmissions =
-            airTravelEmissionsShortHaul + airTravelEmissionsLongHaul;
-  
-      // Calculate yearly totals based on monthly inputs
-      const yearlyElectricityEmissions = electricityEmissions * year;
-      const yearlyTransportationEmissions = transportationEmissions * year;
-  
-      // Calculate total yearly CO2 emissions
-      const totalYearlyEmissions = 
-          yearlyElectricityEmissions + 
-          yearlyTransportationEmissions +
-          totalAirTravelEmissions +
-          dietaryChoiceEmissions;
-
-
-      const result = {
-        totalYearlyEmissions: { value: totalYearlyEmissions, unit: 'kgCO2e/year' },
-        yearlyTransportationEmissions: { value: yearlyTransportationEmissions, unit: 'kgCO2e/year' },
-        yearlyElectricityEmissions: { value: yearlyElectricityEmissions, unit: 'kgCO2e/year' },
-        totalAirTravelEmissions: { value: totalAirTravelEmissions, unit: 'kgCO2e/year' },
-        dietaryChoiceEmissions: { value: dietaryChoiceEmissions, unit: 'kgCO2e/year' },
-      };
-
-      return result;
+function dietaryChoice(index:number) : number {
+    switch (index) {
+        case 0:
+            return 200;
+        case 1:
+            return 400;
+        case 2:
+            return 800;
+        default:
+            break;
+    }
+    return 0;
 }
