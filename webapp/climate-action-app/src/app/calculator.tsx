@@ -8,9 +8,9 @@ const calcFunctions: {[name: string]: (input: number) => number} = {
     "dietChoice": dietaryChoice,
 };
 
-export default function calculate(calcArray: [number, string][]) {
+export default function calculate(inputEmissionsTagArray: [number, string][]) {
     let total = 0;
-    let result: [key: string, value: number][] = calcArray.map((element) => {
+    let result: [key: string, value: number][] = inputEmissionsTagArray.map((element) => {
         if (!(element[1] in calcFunctions)) {
             throw new Error("Undefined operation '" + element[1] + "' attempted");
         }
