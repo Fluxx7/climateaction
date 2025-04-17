@@ -138,6 +138,10 @@ export default function Home() {
         setFormData((prev) => ({ ...prev, airTravelToGiveUp: updated }));
     };
 
+    // Multi-select mutual exclusivity logic for willingToChange
+    const isNotOpenSelected = formData.willingToEngageWith.includes("notOpen");
+    const isAnyOtherEngageSelected = formData.willingToEngageWith.some(val => val !== "notOpen");
+
     return (
         <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
 
@@ -145,7 +149,34 @@ export default function Home() {
                 <button className="calc-btn">Home</button>
             </Link>
             <main>
+                <form className="space-y-6">
+                    {/* Alias Input */}
+                    <input
+                        type="text"
+                        name="alias"
+                        placeholder="Alias"
+                        value={formData.alias}
+                        onChange={handleChange}
+                        className="input-field"
+                    />
 
+                    {/* Referred By */}
+                    <fieldset>
+                        <legend>Referred By</legend>
+                        {referredByOptions.map(option => (
+                            <label key={option.value}>
+                                <input
+                                    type="radio"
+                                    name="referredBy"
+                                    value={option.value}
+                                    checked={formData.referredBy === option.value}
+                                    onChange={handleChange}
+                                />
+                                {option.label}
+                            </label>
+                        ))}
+                    </fieldset>
+                </form>
             </main>
         </div>
     );
