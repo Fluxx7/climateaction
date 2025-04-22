@@ -495,7 +495,7 @@ export default function Home() {
                                 setDrivesCar(!e.target.checked);
                                 setFormData((prev) => ({
                                     ...prev,
-                                    drivesCar: drivesCar
+                                    drivesCar: !drivesCar
                                 }));
                             }}
                         />
