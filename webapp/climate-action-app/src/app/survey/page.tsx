@@ -5,7 +5,74 @@ import Link from "next/link";
 
 export default function Home() {
 
-    const referredByOptions = [
+    type Option = {
+        value: string;
+        label: string;
+    };
+
+    interface RadioGroupProps {
+        name: string;
+        legend: string;
+        options: Option[];
+        value: string;
+        onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+        includeOther?: boolean;
+        otherPlaceholder?: string;
+        otherValue?: string;
+    }
+
+    const RadioGroup = ({
+        name,
+        legend,
+        options,
+        value,
+        onChange,
+        includeOther = false,
+        otherPlaceholder,
+        otherValue,
+    }: RadioGroupProps) => {
+        return (
+            <fieldset>
+                <legend>{legend}</legend>
+                {options.map((option) => (
+                    <label key={option.value}>
+                        <input
+                            type="radio"
+                            name={name}
+                            value={option.value}
+                            checked={value === option.value}
+                            onChange={onChange}
+                        />
+                        {option.label}
+                    </label>
+                ))}
+                {includeOther && (
+                    <>
+                        <label className="inline-label">
+                            <input
+                                type="radio"
+                                name={name}
+                                value="Other"
+                                checked={value === "Other"}
+                                onChange={onChange}
+                            />
+                            Other (please specify):
+                        </label>
+                        <input
+                            type="text"
+                            name={name}
+                            placeholder={otherPlaceholder}
+                            disabled={value !== "Other"}
+                            value={value === "Other" ? otherValue || "" : "Other"}
+                            onChange={onChange}
+                        />
+                    </>
+                )}
+            </fieldset>
+        );
+    };
+
+    const referallOptions = [
         { value: "family", label: "Family" },
         { value: "friends", label: "Friends" },
         { value: "supervisorOrCoworker", label: "Supervisor/Coworkers" },
@@ -25,16 +92,13 @@ export default function Home() {
         { value: "diet", label: "Diet" },
         { value: "groundTransportation", label: "Ground Transportation" },
         { value: "airTravel", label: "Air Travel" },
-        { value: "otherConsumption", label: "Other Consumption (Example: buying clothes)" }
+        { value: "otherConsumption", label: "Other Consumption (Example: buying clothes or furniture)" }
     ];
 
-    const airTravelTypes = [
-        { value: "visitingFriendsAndRelatives", label: "Visiting Friends and Relatives" },
-        { value: "leisure", label: "Leisure" },
-        { value: "business", label: "Business" },
-        { value: "other", label: "Other" },
-        { value: "doesNotFly", label: "I do not use flights" },
-        { value: "notWilling", label: "I am not willing to give up air travel" }
+    const effortToBuyLocalFoodOptions = [
+        { value: "yes", label: "Yes" },
+        { value: "no", label: "No" },
+        { value: "occasionally", label: "Occasionally" }
     ];
 
     const willingToEngageOptions = [
@@ -50,24 +114,22 @@ export default function Home() {
         referredBy: "", // 
         inclinationToChange: "",
         largestImpactChoice: "",
-        carbonFootprint: 0,
-        willingToChange: [] as string[],
-        rankedWillingToChange: [
-            "Home",
-            "Electricity",
-            "Diet",
-            "Ground Transportation",
-            "Air Travel",
-            "Other Consumption",
-        ],
-        airTravelToGiveUp: [] as string[],
-        dietToGiveUp: "",
-        homeOrElectricityToGiveUp: "",
-        groundTransportationToGiveUp: "",
-        consumptionToGiveUp: "",
+        totalCarbonFootprint: 0,
+        airTravelFootprint: 0,
+        homeFootprint: 0,
+        groundTransportationFootprint: 0,
+        dietFootprint: 0,
+        electricityFootprint: 0,
+        otherConsumptionFootprint: 0,
+        airTravelLeisurePercentage: 0,
+        goalToReduceAirTravel: "",
+        replaceableDrivingByTransitPercentage: 0,
+        ideasToImproveDiet: "",
+        effortToBuyLocalFood: "",
+        willingToGiveUp: "",
+        notWillingToGiveUp: "",
         willingToEngageWith: [] as string[],
-        individualGoals: [] as string[],
-        groupGoals: [] as string[],
+        groupGoals: "",
     });
 
     // Handle form input changes
@@ -84,7 +146,7 @@ export default function Home() {
         e.preventDefault(); // Prevent form reloading on submit
 
         // Send data to the backend API
-        const response = await fetch('/api/submitForm', {  
+        const response = await fetch('/api/submitForm', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -109,7 +171,7 @@ export default function Home() {
         setFormData(prev => ({ ...prev, [group]: updated }));
     };
 
-    // Multi-select mutual exclusivity logic for willingToEngageWith
+    // Multi-select mutual exclusivity logic for willingToEngageWith 
     const handleEngageCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { value, checked } = e.target;
         const current = formData.willingToEngageWith;
@@ -135,7 +197,7 @@ export default function Home() {
      * This is a bit different from willingToEngageWith because it has two mutually exclusive options: 
      * (doesNotFly and notWilling) and the rest are mutually exclusive.
      */
-    const handleAirTravelCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    /*const handleAirTravelCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { value, checked } = e.target;
         const current = formData.airTravelToGiveUp;
 
@@ -154,7 +216,7 @@ export default function Home() {
         }
 
         setFormData((prev) => ({ ...prev, airTravelToGiveUp: updated }));
-    };
+    };*/
 
     // Multi-select mutual exclusivity logic for willingToChange
     const isNotOpenSelected = formData.willingToEngageWith.includes("notOpen");
@@ -168,40 +230,18 @@ export default function Home() {
             </Link>
             <main style={{ width: "50%" }}>
                 <form onSubmit={handleSubmit}>
+
                     {/* Referred By */}
-                    <fieldset>
-                        <legend>Who referred you to this survey?</legend>
-                        {referredByOptions.map(option => (
-                            <label key={option.value}>
-                                <input
-                                    type="radio"
-                                    name="referredBy"
-                                    value={option.value}
-                                    checked={formData.referredBy === option.value}
-                                    onChange={handleChange}
-                                />
-                                {option.label}
-                            </label>
-                        ))}
-                        <label className="inline-label">
-                            <input
-                                type="radio"
-                                name="referredBy"
-                                value="Other"
-                                onChange={handleChange}
-                                checked={formData.referredBy === "Other"}
-                            />
-                            Other (please specify):
-                        </label>
-                        <input
-                            type="text"
-                            name="referredBy"
-                            placeholder="Please specify your referral source"
-                            disabled={formData.referredBy !== "Other"}
-                            value={formData.referredBy !== "Other" ? "Other" : formData.referredBy}
-                            onChange={handleChange}
-                        />
-                    </fieldset>
+                    <RadioGroup
+                        name="referredBy"
+                        legend="Who referred you to this survey?"
+                        options={referallOptions}
+                        value={formData.referredBy}
+                        onChange={handleChange}
+                        includeOther
+                        otherPlaceholder="Please specify your referral source"
+                        otherValue={formData.referredBy}
+                    />
 
                     <br />
                     {/* Inclination to Change */}
