@@ -168,7 +168,8 @@ export default function Home() {
                         onChange={handleChange}
                         className="input-field"
                     />
-
+                    
+                    <br/> 
                     {/* Referred By */}
                     <fieldset>
                         <legend>Who referred you to this survey?</legend>
@@ -203,7 +204,8 @@ export default function Home() {
                             onChange={handleChange}
                         />
                     </fieldset>
-
+                    
+                    <br/> 
                     {/* Inclination to Change */}
                     <fieldset>
                         <legend>How inclined do you feel to change your lifestyle choices to be more sustainable?</legend>
@@ -220,11 +222,11 @@ export default function Home() {
                             </label>
                         ))}
                     </fieldset>
-
-                    {/* Largest Impact Choice */}
+                    
+                    <br/> 
+                    {/*Largest Impact Choice */}
                     <fieldset>
                         <legend>Which of your lifestyle choices do you think has the largest impact on the environmenmt?</legend>
-                        <legend>How inclined do you feel to change your lifestyle choices to be more sustainable?</legend>
                         {carbonFootprintCategories.map(option => (
                             <label key={option.value}>
                                 <input
@@ -238,6 +240,12 @@ export default function Home() {
                             </label>
                         ))}
                     </fieldset>
+                    
+                    <br/> 
+                    {/* Submit Button */}
+                    <div>
+                        <button type="submit" className="calc-btn">Submit</button>
+                    </div>
                 </form>
             </main>
         </div>
