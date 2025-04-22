@@ -205,7 +205,7 @@ export default function Home() {
     };
 
     // Multi-select mutual exclusivity logic for willingToEngageWith 
-    /*const handleEngageCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleEngageCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { value, checked } = e.target;
         const current = formData.willingToEngageWith;
 
@@ -223,7 +223,7 @@ export default function Home() {
         }
 
         setFormData(prev => ({ ...prev, willingToEngageWith: updated }));
-    };*/
+    };
 
     /**
      * Multi-select mutual exclusivity logic for airTravelToGiveUp
@@ -252,8 +252,8 @@ export default function Home() {
     };*/
 
     // Multi-select mutual exclusivity logic for willingToChange
-    //const isNotOpenSelected = formData.willingToEngageWith.includes("notOpen");
-    //const isAnyOtherEngageSelected = formData.willingToEngageWith.some(val => val !== "notOpen");
+    const isNotOpenSelected = formData.willingToEngageWith.includes("notOpen");
+    const isAnyOtherEngageSelected = formData.willingToEngageWith.some(val => val !== "notOpen");
 
     return (
         <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
@@ -559,8 +559,9 @@ export default function Home() {
                                 type="checkbox"
                                 name="willingToEngageWith"
                                 value={option.value}
+                                disabled={(isNotOpenSelected && option.value !== "notOpen") || (isAnyOtherEngageSelected && option.value === "notOpen")}
                                 checked={formData.willingToEngageWith.includes(option.value)}
-                                onChange={(e) => handleCheckboxChange(e, "willingToEngageWith")}
+                                onChange={(e) => handleEngageCheckboxChange(e)}
                             />
                             {option.label}
                         </label>
