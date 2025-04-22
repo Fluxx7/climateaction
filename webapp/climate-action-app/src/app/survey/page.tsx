@@ -144,23 +144,17 @@ export default function Home() {
 
 
     // Handle form input changes
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<any>) => {
 
         const { name, value, type } = e.target;
-
-        console.log(formData.airTravelFootprint);
-
+        console.log(name, value, type);
         setFormData((prevData) => ({
             ...prevData,
-            [name]: type === "number" ? Number(value) : value,
+            [name]: value,
         }));
 
-        console.log("here");
-
         if (e.target.type === "number") {
-            console.log("is number");
             if (value === "") {
-                console.log("value is empty");
                 setErrorMessages((prevMessages) => ({
                     ...prevMessages,
                     [name]: "Please enter a valid number.",
@@ -171,7 +165,16 @@ export default function Home() {
                     ...prevMessages,
                     [name]: "", // Clear error if valid
                 }));
+                setFormData((prevData) => ({
+                    ...prevData,
+                    [name]: type === "number" ? Number(value) : value,
+                }));
             }
+        } else {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
         }
     };
 
@@ -256,17 +259,13 @@ export default function Home() {
     const isAnyOtherEngageSelected = formData.willingToEngageWith.some(val => val !== "notOpen");
 
     return (
-        <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-
-            <Link href="/">
-                <button className="calc-btn">Home</button>
-            </Link>
-            <main style={{ width: "50%" }}>
+        <div className="grid grid-rows-[1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+            <main style={{ width: "75%" }}>
                 <form onSubmit={handleSubmit}>
 
                     {/* Referred By */}
                     <fieldset>
-                        <legend>Who referred you to this survey?</legend>
+                        <legend >Who referred you to this survey?</legend>
                         {referallOptions.map(option => (
                             <label key={option.value}>
                                 <input
@@ -302,7 +301,6 @@ export default function Home() {
                             }}
                         />
                     </fieldset>
-                    <br />
 
                     {/* Willing to Change */}
                     {/* Inclination to Change */}
@@ -314,7 +312,6 @@ export default function Home() {
                         onChange={handleChange}
                     />
 
-                    <br />
                     {/*Largest Impact Choice */}
                     <RadioGroup
                         name="largestImpactChoice"
@@ -323,11 +320,11 @@ export default function Home() {
                         value={String(formData.largestImpactChoice)}
                         onChange={handleChange}
                     />
-                    <br />
+
 
                     {/* Total Carbon Footprint */}
-                    <legend>What is your carbon footprint?</legend>
-                    <p className="text-red-500 text-sm min-h-[1rem]">
+                    <legend className="carbon-footprint-question">What is your carbon footprint?</legend>
+                    <p className="text-red-500 text-sm">
                         {errorMessages.totalCarbonFootprint || "\u00A0"}
                     </p>
                     <input
@@ -338,12 +335,11 @@ export default function Home() {
                         value={formData.totalCarbonFootprint}
                         onChange={handleChange}
                     />
-                    <br />
-                    <br />
+
 
                     {/* Air Travel Footprint */}
-                    <legend> What is your carbon footprint for air travel?</legend>
-                    <p className="text-red-500 text-sm min-h-[1rem]">
+                    <legend className="carbon-footprint-question"> What is your carbon footprint for air travel?</legend>
+                    <p className="text-red-500 text-sm">
                         {errorMessages.airTravelFootprint || "\u00A0"}
                     </p>
                     <input
@@ -354,12 +350,10 @@ export default function Home() {
                         value={formData.airTravelFootprint}
                         onChange={handleChange}
                     />
-                    <br />
-                    <br />
 
                     {/* Home Footprint */}
-                    <legend> What is your carbon footprint for home?</legend>
-                    <p className="text-red-500 text-sm min-h-[1rem]">
+                    <legend className="carbon-footprint-question"> What is your carbon footprint for home?</legend>
+                    <p className="text-red-500 text-sm">
                         {errorMessages.homeFootprint || "\u00A0"}
                     </p>
                     <input
@@ -370,12 +364,10 @@ export default function Home() {
                         value={formData.homeFootprint}
                         onChange={handleChange}
                     />
-                    <br />
-                    <br />
 
                     {/* Ground Transportation Footprint */}
-                    <legend> What is your carbon footprint for ground transportation?</legend>
-                    <p className="text-red-500 text-sm min-h-[1rem]">
+                    <legend className="carbon-footprint-question"> What is your carbon footprint for ground transportation?</legend>
+                    <p className="text-red-500 text-sm">
                         {errorMessages.groundTransportationFootprint || "\u00A0"}
                     </p>
                     <input
@@ -386,12 +378,10 @@ export default function Home() {
                         value={formData.groundTransportationFootprint}
                         onChange={handleChange}
                     />
-                    <br />
-                    <br />
 
                     {/* Diet Footprint */}
-                    <legend> What is your carbon footprint for diet?</legend>
-                    <p className="text-red-500 text-sm min-h-[1rem]">
+                    <legend className="carbon-footprint-question"> What is your carbon footprint for diet?</legend>
+                    <p className="text-red-500 text-sm">
                         {errorMessages.dietFootprint || "\u00A0"}
                     </p>
                     <input
@@ -402,12 +392,10 @@ export default function Home() {
                         value={formData.dietFootprint}
                         onChange={handleChange}
                     />
-                    <br />
-                    <br />
 
                     {/* Electricity Footprint */}
-                    <legend> What is your carbon footprint for electricity?</legend>
-                    <p className="text-red-500 text-sm min-h-[1rem]">
+                    <legend className="carbon-footprint-question"> What is your carbon footprint for electricity?</legend>
+                    <p className="text-red-500 text-sm">
                         {errorMessages.electricityFootprint || "\u00A0"}
                     </p>
                     <input
@@ -418,12 +406,10 @@ export default function Home() {
                         value={formData.electricityFootprint}
                         onChange={handleChange}
                     />
-                    <br />
-                    <br />
 
                     {/* Other Consumption Footprint */}
-                    <legend> What is your carbon footprint for other consumption?</legend>
-                    <p className="text-red-500 text-sm min-h-[1rem]">
+                    <legend className="carbon-footprint-question"> What is your carbon footprint for other consumption?</legend>
+                    <p className="text-red-500 text-sm">
                         {errorMessages.otherConsumptionFootprint || "\u00A0"}
                     </p>
                     <input
@@ -434,8 +420,6 @@ export default function Home() {
                         value={formData.otherConsumptionFootprint}
                         onChange={handleChange}
                     />
-                    <br />
-                    <br />
 
                     {/* Air Travel Leisure Percentage */}
                     {formData.airTravelFootprint !== 0 && (
@@ -457,15 +441,12 @@ export default function Home() {
 
                     {/* Goal to Reduce Air Travel */}
                     <legend> If possible, write a goal you can pursue to reduce your air travel: </legend>
-                    <input
-                        className={`border p-2 rounded-md`}
+                    <textarea
+                        className="large-text-box"
                         name="goalToReduceAirTravel"
-                        type="text"
-                        value={formData.otherConsumptionFootprint}
+                        value={formData.goalToReduceAirTravel}
                         onChange={handleChange}
                     />
-                    <br />
-                    <br />
 
                     {/* Replaceable Driving by Transit Percentage */}
                     <legend> What percentage of your driving can be replaced by public transit?</legend>
@@ -475,7 +456,7 @@ export default function Home() {
                         min="0"
                         max="100"
                         step="5"
-                        value={drivesCar ? formData.replaceableDrivingByTransitPercentage : 0}
+                        value={formData.replaceableDrivingByTransitPercentage}
                         onChange={handleChange}
                         className="w-[calc(100%-4rem)] align-middle"
                         disabled={!drivesCar}
@@ -490,7 +471,6 @@ export default function Home() {
                     </span>
 
                     {/* Checkbox for "I do not drive a car" */}
-                    <br />
                     <label>
                         <input
                             type="checkbox"
@@ -506,14 +486,15 @@ export default function Home() {
                         />
                         I do not drive a car.
                     </label>
-                    <br />
-                    <br />
 
                     {/* Ideas to Improve Diet */}
                     <legend> Do you have any ideas to improve your diet for the future?</legend>
-
-                    <br />
-                    <br />
+                    <textarea
+                        className="large-text-box"
+                        name="ideasToImproveDiet"
+                        value={formData.ideasToImproveDiet}
+                        onChange={handleChange}
+                    />
 
                     {/* Effort to Buy Local Food */}
                     <RadioGroup
@@ -523,8 +504,6 @@ export default function Home() {
                         value={formData.effortToBuyLocalFood}
                         onChange={handleChange}
                     />
-                    <br />
-                    <br />
 
                     {/* Willing to Give Up */}
                     <legend> What are you willing to give up to reduce your carbon footprint?</legend>
@@ -535,8 +514,6 @@ export default function Home() {
                         value={formData.willingToGiveUp}
                         onChange={handleChange}
                     />
-                    <br />
-                    <br />
 
                     {/* Not Willing to Give Up */}
                     <legend> What are you NOT willing to give up to reduce your carbon footprint?</legend>
@@ -547,8 +524,6 @@ export default function Home() {
                         value={formData.notWillingToGiveUp}
                         onChange={handleChange}
                     />
-                    <br />
-                    <br />
 
                     {/* Willing to Engage With */}
                     <legend> Would you be willing to engage with friends, family, or coworkers to reduce your climate impact?</legend>
@@ -565,28 +540,23 @@ export default function Home() {
                             />
                             {option.label}
                         </label>
-                        
+
                     ))}
 
-                    <br />
-                    <br />
-
                     {/* Group Goals */}
-                    <legend> 
-                        Write 1-2 goals that you could pursue in a group or community to 
-                        reduce your collective carbon footprints. (Example: "We will all 
-                        take the S-Bahn to commute to work at least once a week" or 
+                    <legend>
+                        Write 1-2 goals that you could pursue in a group or community to
+                        reduce your collective carbon footprints. (Example: "We will all
+                        take the S-Bahn to commute to work at least once a week" or
                         "We won't fly on airplanes when we go on vacations together.") </legend>
-                        <input
-                            className={`border p-2 rounded-md`}
-                            name="groupGoals"
-                            type="text"
-                            value={formData.groupGoals}
-                            onChange={handleChange}
-                        />
+                    <textarea
+                        className="large-text-box"
+                        name="groupGoals"
+                        value={formData.groupGoals}
+                        onChange={handleChange}
+                    />
                     {/* Submit Button */}
-                    <br />
-                    <br />
+
                     <div>
                         <button type="submit" className="calc-btn">Submit</button>
                     </div>
