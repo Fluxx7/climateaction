@@ -1,6 +1,6 @@
 "use client";
 
-import {useState } from "react";
+import { useState } from "react";
 import * as options from "./options";
 import { useFormState } from './useFormState';
 
@@ -53,7 +53,7 @@ export default function Home() {
             </fieldset>
         );
     };
-    
+
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault(); // Prevent form reloading on submit
@@ -165,10 +165,10 @@ export default function Home() {
                     {/* Total Carbon Footprint */}
                     <legend className="carbon-footprint-question">What is your carbon footprint?</legend>
                     <p className="text-red-500 text-sm">
-                        {errorMessages.totalCarbonFootprint || "\u00A0"}
+                        {errorMessages.totalCarbonFootprint || "\u00A0"} { /* No-break-space character to maintain paragraph height for consistent formatting */}
                     </p>
                     <input
-                        className={`border p-2 rounded-md ${errorMessages.totalCarbonFootprint ? 'border-red-500' : 'border-gray-300'}`}
+                        className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
                         name="totalCarbonFootprint"
                         type="number"
                         step="0.01"
@@ -183,7 +183,7 @@ export default function Home() {
                         {errorMessages.airTravelFootprint || "\u00A0"}
                     </p>
                     <input
-                        className={`border p-2 rounded-md ${errorMessages.airTravelFootprint ? 'border-red-500' : 'border-gray-300'}`}
+                        className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
                         name="airTravelFootprint"
                         type="number"
                         step="0.01"
@@ -197,7 +197,7 @@ export default function Home() {
                         {errorMessages.homeFootprint || "\u00A0"}
                     </p>
                     <input
-                        className={`border p-2 rounded-md ${errorMessages.homeFootprint ? 'border-red-500' : 'border-gray-300'}`}
+                        className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
                         name="homeFootprint"
                         type="number"
                         step="0.01"
@@ -211,7 +211,7 @@ export default function Home() {
                         {errorMessages.groundTransportationFootprint || "\u00A0"}
                     </p>
                     <input
-                        className={`border p-2 rounded-md ${errorMessages.groundTransportationFootprint ? 'border-red-500' : 'border-gray-300'}`}
+                        className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
                         name="groundTransportationFootprint"
                         type="number"
                         step="0.01"
@@ -225,7 +225,7 @@ export default function Home() {
                         {errorMessages.dietFootprint || "\u00A0"}
                     </p>
                     <input
-                        className={`border p-2 rounded-md ${errorMessages.dietFootprint ? 'border-red-500' : 'border-gray-300'}`}
+                        className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
                         name="dietFootprint"
                         type="number"
                         step="0.01"
@@ -239,7 +239,7 @@ export default function Home() {
                         {errorMessages.electricityFootprint || "\u00A0"}
                     </p>
                     <input
-                        className={`border p-2 rounded-md ${errorMessages.electricityFootprint ? 'border-red-500' : 'border-gray-300'}`}
+                        className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
                         name="electricityFootprint"
                         type="number"
                         step="0.01"
@@ -253,7 +253,7 @@ export default function Home() {
                         {errorMessages.otherConsumptionFootprint || "\u00A0"}
                     </p>
                     <input
-                        className={`border p-2 rounded-md ${errorMessages.otherConsumptionFootprint ? 'border-red-500' : 'border-gray-300'}`}
+                        className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
                         name="otherConsumptionFootprint"
                         type="number"
                         step="0.01"

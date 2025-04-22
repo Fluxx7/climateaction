@@ -56,6 +56,20 @@ input[type="text"] {
   border-radius: 0.375rem;
 }
 
+.input-error {
+  border: 2px solid #f87171; /* border-red-500 */
+}
+
+.input-normal {
+  border: 2px solid #d1d5db; /* border-gray-300 */
+}
+
+.input-base {
+  padding: 0.5rem; /* p-2 */
+  border-radius: 0.375rem; /* rounded-md */
+}
+
+
 .carbon-footprint-question {
   display: block;
   margin-bottom: 0px;
