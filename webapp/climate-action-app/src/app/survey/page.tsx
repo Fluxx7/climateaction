@@ -1,35 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import {useState } from "react";
+import * as options from "./options";
+import { useFormState } from './useFormState';
 
 export default function Home() {
 
-    const [drivesCar, setDrivesCar] = useState(true);
+    const { formData, setFormData, errorMessages, handleChange } = useFormState();
+    const [drivesCar, setDrivesCar] = useState(true); // Used for enabling the slider for replaceableDrivingByTransitPercentage
 
-    const [errorMessages, setErrorMessages] = useState<{ [key: string]: string }>({
-        totalCarbonFootprint: "",
-        airTravelFootprint: "",
-        homeFootprint: "",
-        groundTransportationFootprint: "",
-        dietFootprint: "",
-        electricityFootprint: "",
-        otherConsumptionFootprint: "",
-    });
-
+    // Options for radio buttons for multiple choice questions
+    // Used for inclinationToChange, largestImpactChoice, effortToBuyLocalFood
     type Option = {
         value: string;
         label: string;
     };
 
+    // RadioGroup interface for rendering radio button groups
+    // This is used for inclinationToChange, largestImpactChoice, and effortToBuyLocalFood
     interface RadioGroupProps {
-        name: string;
-        legend: string;
-        options: Option[];
-        value: string;
+        name: string; // Name of the radio group (same as key in formData)
+        legend: string; // Question
+        options: Option[]; // Array of options for the radio buttons 
+        value: string; // Currently selected value (passed in from formData)
         onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     }
 
+    // RadioGroup component for rendering radio button groups
     const RadioGroup = ({
         name,
         legend,
@@ -41,158 +38,22 @@ export default function Home() {
             <fieldset>
                 <legend>{legend}</legend>
                 {options.map((option) => (
-                    <label key={option.value}>
+                    <label key={option.value}> {/* Label for each option from options */}
+                        {/* Radio button for each option */}
                         <input
                             type="radio"
-                            name={name}
-                            value={option.value}
-                            checked={value === option.value}
+                            name={name} // Name of the radio group, matches the key in formData
+                            value={option.value} // Value of a specific option
+                            checked={value === option.value} // Compares selected value with value of current option
                             onChange={onChange}
                         />
-                        {option.label}
+                        {option.label} {/* Label for the radio button */}
                     </label>
                 ))}
             </fieldset>
         );
     };
-
-    const referallOptions = [
-        { value: "family", label: "Family" },
-        { value: "friends", label: "Friends" },
-        { value: "supervisorOrCoworker", label: "Supervisor/Coworkers" },
-    ];
-
-    const inclinationOptions = [
-        { value: "notInclined", label: "Not Inclined" },
-        { value: "slightlyInclined", label: "Slightly Inclined" },
-        { value: "moderatelyInclined", label: "Moderately Inclined" },
-        { value: "veryInclined", label: "Very Inclined" }
-    ];
-
-    // Used for largestImpactChoice, willingToChange, and rankedWillingToChange
-    const carbonFootprintCategories = [
-        { value: "home", label: "Home" },
-        { value: "electricity", label: "Electricity" },
-        { value: "diet", label: "Diet" },
-        { value: "groundTransportation", label: "Ground Transportation" },
-        { value: "airTravel", label: "Air Travel" },
-        { value: "otherConsumption", label: "Other Consumption (Example: buying clothes or furniture)" }
-    ];
-
-    const effortToBuyLocalFoodOptions = [
-        { value: "yes", label: "Yes" },
-        { value: "no", label: "No" },
-        { value: "occasionally", label: "Occasionally" }
-    ];
-
-    const willingToEngageOptions = [
-        { value: "friends", label: "I would engage with friends" },
-        { value: "family", label: "I would engage with family" },
-        { value: "coworkers", label: "I would engage with coworkers" },
-        { value: "otherCommunities", label: "I would engage with other communities" },
-        { value: "notOpen", label: "I would not be open to engaging in a community" }
-    ];
-
-    interface FormData {
-        referredBy: string; // Example: "family", "friends", etc.
-        otherReferralValue: string; // Free text input
-        inclinationToChange: string; // Example: "notInclined", "slightlyInclined", etc.
-        largestImpactChoice: string; // Example: "home", "electricity", etc.
-        totalCarbonFootprint: number; // Numeric input
-        airTravelFootprint: number; // Numeric input
-        homeFootprint: number; // Numeric input
-        groundTransportationFootprint: number; // Numeric input
-        dietFootprint: number; // Numeric input
-        electricityFootprint: number; // Numeric input
-        otherConsumptionFootprint: number; // Numeric input
-        airTravelLeisurePercentage: number; // Slider value (0-100)
-        goalToReduceAirTravel: string; // Free text input
-        drivesCar: boolean; // Checkbox value
-        replaceableDrivingByTransitPercentage: number; // Slider value (0-100)
-        ideasToImproveDiet: string; // Free text input
-        effortToBuyLocalFood: string; // Example: "yes", "no", "occasionally"
-        willingToGiveUp: string; // Example: "meat", "flying", etc.
-        notWillingToGiveUp: string; // Example: "meat", "flying", etc.
-        willingToEngageWith: string[]; // Multi-select checkbox values
-        groupGoals: string; // Free text input
-    }
-    // State to manage user's input into form
-    const [formData, setFormData] = useState<FormData>({
-        referredBy: "", // 
-        otherReferralValue: "",
-        inclinationToChange: "",
-        largestImpactChoice: "",
-        totalCarbonFootprint: 0,
-        airTravelFootprint: 0,
-        homeFootprint: 0,
-        groundTransportationFootprint: 0,
-        dietFootprint: 0,
-        electricityFootprint: 0,
-        otherConsumptionFootprint: 0,
-        airTravelLeisurePercentage: 0,
-        goalToReduceAirTravel: "",
-        drivesCar: true,
-        replaceableDrivingByTransitPercentage: 0,
-        ideasToImproveDiet: "",
-        effortToBuyLocalFood: "",
-        willingToGiveUp: "",
-        notWillingToGiveUp: "",
-        willingToEngageWith: [] as string[],
-        groupGoals: "",
-    });
-
-
-
-    // Handle form input changes
-    const handleChange = (e: React.ChangeEvent<any>) => {
-
-        const { name, value, type } = e.target;
-        console.log(name, value, type);
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-
-        if(name === "airTravelFootprint" && value === "0") {
-            setFormData((prevData) => ({
-                ...prevData,
-                [name]: type === "number" ? Number(value) : value,
-                airTravelLeisurePercentage: 0,
-            }));
-
-            setErrorMessages((prevMessages) => ({
-                ...prevMessages,
-                [name]: "", // Clear error if valid
-            }));
-            return;
-        }
-
-        if (e.target.type === "number") {
-            if (value === "") {
-                setErrorMessages((prevMessages) => ({
-                    ...prevMessages,
-                    [name]: "Please enter a valid number.",
-                }));
-                return;
-            } else {
-                setErrorMessages((prevMessages) => ({
-                    ...prevMessages,
-                    [name]: "", // Clear error if valid
-                }));
-                
-                setFormData((prevData) => ({
-                    ...prevData,
-                    [name]: type === "number" ? Number(value) : value,
-                }));
-            }
-        } else {
-            setFormData((prevData) => ({
-                ...prevData,
-                [name]: value,
-            }));
-        }
-    };
-
+    
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault(); // Prevent form reloading on submit
@@ -243,32 +104,6 @@ export default function Home() {
         setFormData(prev => ({ ...prev, willingToEngageWith: updated }));
     };
 
-    /**
-     * Multi-select mutual exclusivity logic for airTravelToGiveUp
-     * This is a bit different from willingToEngageWith because it has two mutually exclusive options: 
-     * (doesNotFly and notWilling) and the rest are mutually exclusive.
-     */
-    /*const handleAirTravelCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { value, checked } = e.target;
-        const current = formData.airTravelToGiveUp;
-
-        let updated: string[] = [];
-
-        const exclusive = ["doesNotFly", "notWilling"];
-        if (checked) {
-            if (exclusive.includes(value)) {
-                updated = [value];
-            } else {
-                updated = current.filter((val) => !exclusive.includes(val));
-                updated.push(value);
-            }
-        } else {
-            updated = current.filter((val) => val !== value);
-        }
-
-        setFormData((prev) => ({ ...prev, airTravelToGiveUp: updated }));
-    };*/
-
     // Multi-select mutual exclusivity logic for willingToChange
     const isNotOpenSelected = formData.willingToEngageWith.includes("notOpen");
     const isAnyOtherEngageSelected = formData.willingToEngageWith.some(val => val !== "notOpen");
@@ -281,7 +116,7 @@ export default function Home() {
                     {/* Referred By */}
                     <fieldset>
                         <legend >Who referred you to this survey?</legend>
-                        {referallOptions.map(option => (
+                        {options.referallOptions.map(option => (
                             <label key={option.value}>
                                 <input
                                     type="radio"
@@ -322,7 +157,7 @@ export default function Home() {
                     <RadioGroup
                         name="inclinationToChange"
                         legend="How inclined do you feel to change your lifestyle choices to be more sustainable?"
-                        options={inclinationOptions}
+                        options={options.inclinationOptions}
                         value={String(formData.inclinationToChange)}
                         onChange={handleChange}
                     />
@@ -331,7 +166,7 @@ export default function Home() {
                     <RadioGroup
                         name="largestImpactChoice"
                         legend="Which of your lifestyle choices do you think has the largest impact on the environmenmt?"
-                        options={carbonFootprintCategories}
+                        options={options.carbonFootprintCategories}
                         value={String(formData.largestImpactChoice)}
                         onChange={handleChange}
                     />
@@ -515,7 +350,7 @@ export default function Home() {
                     <RadioGroup
                         name="effortToBuyLocalFood"
                         legend="Do you make an effort to buy local food?"
-                        options={effortToBuyLocalFoodOptions}
+                        options={options.effortToBuyLocalFoodOptions}
                         value={formData.effortToBuyLocalFood}
                         onChange={handleChange}
                     />
@@ -543,7 +378,7 @@ export default function Home() {
                     {/* Willing to Engage With */}
                     <legend> Would you be willing to engage with friends, family, or coworkers to reduce your climate impact?</legend>
 
-                    {willingToEngageOptions.map((option) => (
+                    {options.willingToEngageOptions.map((option) => (
                         <label key={option.value}>
                             <input
                                 type="checkbox"
