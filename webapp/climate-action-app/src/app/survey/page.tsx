@@ -73,16 +73,6 @@ export default function Home() {
         }
     };
 
-    // Handle multi-select checkbox changes
-    const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>, group: string) => {
-        const { value, checked } = e.target;
-        const current = formData[group as keyof typeof formData] as string[];
-        const updated = checked
-            ? [...current, value]
-            : current.filter((item) => item !== value);
-        setFormData(prev => ({ ...prev, [group]: updated }));
-    };
-
     // Multi-select mutual exclusivity logic for willingToEngageWith 
     const handleEngageCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { value, checked } = e.target;
