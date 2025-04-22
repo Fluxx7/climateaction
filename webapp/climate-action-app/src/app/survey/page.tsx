@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function Home() {
@@ -16,9 +16,6 @@ export default function Home() {
         options: Option[];
         value: string;
         onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-        includeOther?: boolean;
-        otherPlaceholder?: string;
-        otherValue?: string;
     }
 
     const RadioGroup = ({
@@ -26,10 +23,7 @@ export default function Home() {
         legend,
         options,
         value,
-        onChange,
-        includeOther = false,
-        otherPlaceholder,
-        otherValue,
+        onChange
     }: RadioGroupProps) => {
         return (
             <fieldset>
@@ -46,28 +40,6 @@ export default function Home() {
                         {option.label}
                     </label>
                 ))}
-                {includeOther && (
-                    <>
-                        <label className="inline-label">
-                            <input
-                                type="radio"
-                                name={name}
-                                value="Other"
-                                checked={value === "Other"}
-                                onChange={onChange}
-                            />
-                            Other (please specify):
-                        </label>
-                        <input
-                            type="text"
-                            name={name}
-                            placeholder={otherPlaceholder}
-                            disabled={value !== "Other"}
-                            value={value === "Other" ? otherValue || "" : "Other"}
-                            onChange={onChange}
-                        />
-                    </>
-                )}
             </fieldset>
         );
     };
@@ -112,6 +84,7 @@ export default function Home() {
     // State to manage user's input into form
     const [formData, setFormData] = useState({
         referredBy: "", // 
+        otherReferralValue: "",
         inclinationToChange: "",
         largestImpactChoice: "",
         totalCarbonFootprint: 0,
@@ -132,9 +105,12 @@ export default function Home() {
         groupGoals: "",
     });
 
+
+
     // Handle form input changes
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
+
         setFormData((prevData) => ({
             ...prevData,
             [name]: value,
@@ -145,7 +121,6 @@ export default function Home() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault(); // Prevent form reloading on submit
 
-        // Send data to the backend API
         const response = await fetch('/api/submitForm', {
             method: 'POST',
             headers: {
@@ -232,54 +207,64 @@ export default function Home() {
                 <form onSubmit={handleSubmit}>
 
                     {/* Referred By */}
+                    <fieldset>
+                        <legend>Who referred you to this survey?</legend>
+                        {referallOptions.map(option => (
+                            <label key={option.value}>
+                                <input
+                                    type="radio"
+                                    name="referredBy"
+                                    value={option.value}
+                                    checked={formData.referredBy === option.value}
+                                    onChange={handleChange}
+                                />
+                                {option.label}
+                            </label>
+                        ))}
+                        <label className="inline-label">
+                            <input
+                                type="radio"
+                                name="referredBy"
+                                value="Other"
+                                onChange={handleChange}
+                                checked={formData.referredBy === "Other"}
+                            />
+                            Other (please specify):
+                        </label>
+                        <input
+                            type="text"
+                            name="otherReferralValue"
+                            disabled={formData.referredBy !== 'Other'}
+                            value={formData.otherReferralValue}
+                            onChange={handleChange}
+                            className="border border-gray rounded-md p-2"
+                            style={{color: formData.referredBy === 'Other' ? 'var(--foreground)' : 'gray'}}
+                        />
+                    </fieldset>
+                    <br />
+
+                    {/* Willing to Change */}
+                    {/* Inclination to Change */}
                     <RadioGroup
-                        name="referredBy"
-                        legend="Who referred you to this survey?"
-                        options={referallOptions}
-                        value={formData.referredBy}
+                        name="inclinationToChange"
+                        legend="How inclined do you feel to change your lifestyle choices to be more sustainable?"
+                        options={inclinationOptions}
+                        value={formData.inclinationToChange}
                         onChange={handleChange}
-                        includeOther
-                        otherPlaceholder="Please specify your referral source"
-                        otherValue={formData.referredBy}
                     />
 
                     <br />
-                    {/* Inclination to Change */}
-                    <fieldset>
-                        <legend>How inclined do you feel to change your lifestyle choices to be more sustainable?</legend>
-                        {inclinationOptions.map(option => (
-                            <label key={option.value}>
-                                <input
-                                    type="radio"
-                                    name="inclinationToChange"
-                                    value={option.value}
-                                    checked={formData.inclinationToChange === option.value}
-                                    onChange={handleChange}
-                                />
-                                {option.label}
-                            </label>
-                        ))}
-                    </fieldset>
-
-                    <br />
                     {/*Largest Impact Choice */}
-                    <fieldset>
-                        <legend>Which of your lifestyle choices do you think has the largest impact on the environmenmt?</legend>
-                        {carbonFootprintCategories.map(option => (
-                            <label key={option.value}>
-                                <input
-                                    type="radio"
-                                    name="largestImpactChocie"
-                                    value={option.value}
-                                    checked={formData.largestImpactChoice === option.value}
-                                    onChange={handleChange}
-                                />
-                                {option.label}
-                            </label>
-                        ))}
-                    </fieldset>
-
+                    <RadioGroup
+                        name="largestImpactChoice"
+                        legend="Which of your lifestyle choices do you think has the largest impact on the environmenmt?"
+                        options={carbonFootprintCategories}
+                        value={formData.largestImpactChoice}
+                        onChange={handleChange}
+                    />
                     <br />
+
+
                     {/* Submit Button */}
                     <div>
                         <button type="submit" className="calc-btn">Submit</button>
