@@ -40,6 +40,16 @@ fieldset label {
   margin-bottom: 10px;
 }
 
-fieldset input[type="checkbox"], fieldset input[type="radio"] {
+fieldset input[type="checkbox"], fieldset input[type="radio"]{
   margin-right: 10px; /* Add space between the checkbox/radio and the text */
+}
+
+fieldset input[type="text"] {
+  margin-left: 5px;
+}
+
+fieldset .inline-label {
+  display: inline-flex;
+  align-items: center; /* Align the checkbox and input vertically */
+  margin-bottom: 10px; /* Add space at the bottom to match the other labels */
 }

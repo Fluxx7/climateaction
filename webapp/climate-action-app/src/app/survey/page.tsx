@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { group } from "console";
 
 export default function Home() {
 
@@ -148,8 +147,8 @@ export default function Home() {
             <Link href="/">
                 <button className="calc-btn">Home</button>
             </Link>
-            <main>
-                <form className="space-y-6">
+            <main style={{ width: "50%" }}>
+                <form>
                     {/* Alias Input */}
                     <input
                         type="text"
@@ -162,7 +161,7 @@ export default function Home() {
 
                     {/* Referred By */}
                     <fieldset>
-                        <legend>Referred By</legend>
+                        <legend>Who referred you to this survey?</legend>
                         {referredByOptions.map(option => (
                             <label key={option.value}>
                                 <input
@@ -170,6 +169,59 @@ export default function Home() {
                                     name="referredBy"
                                     value={option.value}
                                     checked={formData.referredBy === option.value}
+                                    onChange={handleChange}
+                                />
+                                {option.label}
+                            </label>
+                        ))}
+                        <label className="inline-label">
+                            <input
+                                type="radio"
+                                name="referredBy"
+                                value="Other"
+                                onChange={handleChange}
+                                checked={formData.referredBy === "Other"}
+                            />
+                            Other (please specify):
+                        </label>
+                        <input
+                            type="text"
+                            name="referredBy"
+                            placeholder="Please specify your referral source"
+                            disabled={formData.referredBy !== "Other"}
+                            value= {formData.referredBy !== "Other" ? "Other" : formData.referredBy}
+                            onChange={handleChange}
+                        />
+                    </fieldset>
+
+                    {/* Inclination to Change */}
+                    <fieldset>
+                        <legend>How inclined do you feel to change your lifestyle choices to be more sustainable?</legend>
+                        {inclinationOptions.map(option => (
+                            <label key={option.value}>
+                                <input
+                                    type="radio"
+                                    name="inclinationToChange"
+                                    value={option.value}
+                                    checked={formData.inclinationToChange === option.value}
+                                    onChange={handleChange}
+                                />
+                                {option.label}
+                            </label>
+                        ))}
+                    </fieldset>
+
+                    {/* Largest Impact Choice */}
+                    <fieldset>
+                        <legend>Which of your lifestyle choices do you think has the largest impact on the environmenmt?</legend>
+                        <legend>How inclined do you feel to change your lifestyle choices to be more sustainable?</legend>
+                        {carbonFootprintCategories.map(option => (
+                            <label key={option.value}>
+                                <input
+                                    type="radio"
+                                    name="largestImpactChocie"
+                                    value={option.value}
+                                    checked={formData.largestImpactChocie === option.value}
                                     onChange={handleChange}
                                 />
                                 {option.label}
