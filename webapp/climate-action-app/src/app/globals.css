@@ -35,12 +35,12 @@ body {
   @apply px-4 py-2 bg-button-primary text-white rounded hover:bg-button-primary-hover;
 }
 
-fieldset label {
+label {
   display: block;
   margin-bottom: 10px;
 }
 
-fieldset input[type="checkbox"], fieldset input[type="radio"]{
+input[type="checkbox"], input[type="radio"]{
   margin-right: 10px; /* Add space between the checkbox/radio and the text */
 }
 
