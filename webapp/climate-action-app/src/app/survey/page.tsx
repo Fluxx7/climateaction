@@ -231,7 +231,7 @@ export default function Home() {
                                     type="radio"
                                     name="largestImpactChocie"
                                     value={option.value}
-                                    checked={formData.largestImpactChocie === option.value}
+                                    checked={formData.largestImpactChoice === option.value}
                                     onChange={handleChange}
                                 />
                                 {option.label}
