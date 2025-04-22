@@ -1,9 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { initializeDatabase } from "../db/dbInit";
 
 export default function Home() {
+
+    useEffect(() => {
+        // Trigger the database initialization when the page is loaded
+        const initDatabase = async () => {
+          try {
+            const response = await fetch('/api/init-db');
+            if (response.ok) {
+              console.log('Database initialized');
+            } else {
+              console.error('Error initializing database');
+            }
+          } catch (error) {
+            console.error('Error:', error);
+          }
+        };
+    
+        initDatabase();
+      }, []);
 
     const [drivesCar, setDrivesCar] = useState(true);
 
@@ -153,7 +171,7 @@ export default function Home() {
             [name]: value,
         }));
 
-        if(name === "airTravelFootprint" && value === "0") {
+        if (name === "airTravelFootprint" && value === "0") {
             setFormData((prevData) => ({
                 ...prevData,
                 [name]: type === "number" ? Number(value) : value,
@@ -179,7 +197,7 @@ export default function Home() {
                     ...prevMessages,
                     [name]: "", // Clear error if valid
                 }));
-                
+
                 setFormData((prevData) => ({
                     ...prevData,
                     [name]: type === "number" ? Number(value) : value,
