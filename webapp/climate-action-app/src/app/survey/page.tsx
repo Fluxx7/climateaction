@@ -80,6 +80,16 @@ export default function Home() {
         }));
     };
 
+    // Handle form submission
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        // Logging form data to console for now
+        console.log(formData);
+
+        // IN THE FUTURE: Send formData to database
+    };
+
     // Handle multi-select checkbox changes
     const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>, group: string) => {
         const { value, checked } = e.target;
