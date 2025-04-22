@@ -1,7 +1,5 @@
 import { useState } from 'react';
 
-
-
 export function useFormState() {
     // State to manage user's input into form
     const [formData, setFormData] = useState<FormData>({
@@ -91,6 +89,7 @@ export function useFormState() {
 
     return {
         formData,
+        setFormData,
         errorMessages,
         handleChange,
       };
