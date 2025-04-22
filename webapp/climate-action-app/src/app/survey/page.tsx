@@ -47,7 +47,6 @@ export default function Home() {
 
     // State to manage user's input into form
     const [formData, setFormData] = useState({
-        alias: "",                  // Used to identify the user with a custom name 
         referredBy: "", // 
         inclinationToChange: "",
         largestImpactChocie: "",
@@ -169,17 +168,6 @@ export default function Home() {
             </Link>
             <main style={{ width: "50%" }}>
                 <form onSubmit={handleSubmit}>
-                    {/* Alias Input */}
-                    <input
-                        type="text"
-                        name="alias"
-                        placeholder="Alias"
-                        value={formData.alias}
-                        onChange={handleChange}
-                        className="input-field"
-                    />
-
-                    <br />
                     {/* Referred By */}
                     <fieldset>
                         <legend>Who referred you to this survey?</legend>
