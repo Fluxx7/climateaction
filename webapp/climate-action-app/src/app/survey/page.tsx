@@ -81,13 +81,23 @@ export default function Home() {
     };
 
     // Handle form submission
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault(); // Prevent form reloading on submit
 
-        // Logging form data to console for now
-        console.log(formData);
+        // Send data to the backend API
+        const response = await fetch('/api/submitForm', {  
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        });
 
-        // IN THE FUTURE: Send formData to database
+        if (response.ok) {
+            console.log('Form submitted successfully');
+        } else {
+            console.error('Error submitting form');
+        }
     };
 
     // Handle multi-select checkbox changes
@@ -158,7 +168,7 @@ export default function Home() {
                 <button className="calc-btn">Home</button>
             </Link>
             <main style={{ width: "50%" }}>
-                <form>
+                <form onSubmit={handleSubmit}>
                     {/* Alias Input */}
                     <input
                         type="text"
@@ -168,8 +178,8 @@ export default function Home() {
                         onChange={handleChange}
                         className="input-field"
                     />
-                    
-                    <br/> 
+
+                    <br />
                     {/* Referred By */}
                     <fieldset>
                         <legend>Who referred you to this survey?</legend>
@@ -200,12 +210,12 @@ export default function Home() {
                             name="referredBy"
                             placeholder="Please specify your referral source"
                             disabled={formData.referredBy !== "Other"}
-                            value= {formData.referredBy !== "Other" ? "Other" : formData.referredBy}
+                            value={formData.referredBy !== "Other" ? "Other" : formData.referredBy}
                             onChange={handleChange}
                         />
                     </fieldset>
-                    
-                    <br/> 
+
+                    <br />
                     {/* Inclination to Change */}
                     <fieldset>
                         <legend>How inclined do you feel to change your lifestyle choices to be more sustainable?</legend>
@@ -222,8 +232,8 @@ export default function Home() {
                             </label>
                         ))}
                     </fieldset>
-                    
-                    <br/> 
+
+                    <br />
                     {/*Largest Impact Choice */}
                     <fieldset>
                         <legend>Which of your lifestyle choices do you think has the largest impact on the environmenmt?</legend>
@@ -240,8 +250,8 @@ export default function Home() {
                             </label>
                         ))}
                     </fieldset>
-                    
-                    <br/> 
+
+                    <br />
                     {/* Submit Button */}
                     <div>
                         <button type="submit" className="calc-btn">Submit</button>
