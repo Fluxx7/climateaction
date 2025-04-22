@@ -153,6 +153,20 @@ export default function Home() {
             [name]: value,
         }));
 
+        if(name === "airTravelFootprint" && value === "0") {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: type === "number" ? Number(value) : value,
+                airTravelLeisurePercentage: 0,
+            }));
+
+            setErrorMessages((prevMessages) => ({
+                ...prevMessages,
+                [name]: "", // Clear error if valid
+            }));
+            return;
+        }
+
         if (e.target.type === "number") {
             if (value === "") {
                 setErrorMessages((prevMessages) => ({
@@ -165,6 +179,7 @@ export default function Home() {
                     ...prevMessages,
                     [name]: "", // Clear error if valid
                 }));
+                
                 setFormData((prevData) => ({
                     ...prevData,
                     [name]: type === "number" ? Number(value) : value,
