@@ -35,17 +35,53 @@ body {
   @apply px-4 py-2 bg-button-primary text-white rounded hover:bg-button-primary-hover;
 }
 
-fieldset label {
+legend {
+  font-size: 1.2em;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+form fieldset:first-of-type legend {
+  margin-top: 0;
+}
+
+label {
   display: block;
   margin-bottom: 10px;
 }
 
-fieldset input[type="checkbox"], fieldset input[type="radio"]{
+input[type="text"] {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+}
+
+.carbon-footprint-question {
+  display: block;
+  margin-bottom: 0px;
+}
+input[type="checkbox"], input[type="radio"]{
   margin-right: 10px; /* Add space between the checkbox/radio and the text */
 }
 
 fieldset input[type="text"] {
   margin-left: 5px;
+}
+
+button[type="submit"] {
+  margin-top: 20px;
+}
+.large-text-box {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  line-height: 1.5rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.375rem;
+  resize: vertical;
+  height: 100px;
+  min-height: 100px;
+  box-sizing: border-box;
 }
 
 fieldset .inline-label {
