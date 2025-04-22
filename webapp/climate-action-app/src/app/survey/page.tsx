@@ -263,7 +263,7 @@ export default function Home() {
 
                     {/* Air Travel Leisure Percentage */}
                     {formData.airTravelFootprint !== 0 && (
-                        <>
+                        <div className="range-input">
                             <legend>What percentage of your air travel is for leisure?</legend>
                             <input
                                 type="range"
@@ -273,10 +273,9 @@ export default function Home() {
                                 step="5"
                                 value={formData.airTravelLeisurePercentage}
                                 onChange={handleChange}
-                                className="w-[calc(100%-4rem)] align-middle"
                             />
-                            <span className="align-middle ml-2">{formData.airTravelLeisurePercentage}%</span>
-                        </>
+                            <span>{formData.airTravelLeisurePercentage}%</span>
+                        </div>
                     )}
 
                     {/* Goal to Reduce Air Travel */}
@@ -287,29 +286,22 @@ export default function Home() {
                         value={formData.goalToReduceAirTravel}
                         onChange={handleChange}
                     />
-
+                    className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
                     {/* Replaceable Driving by Transit Percentage */}
-                    <legend> What percentage of your driving can be replaced by public transit?</legend>
-                    <input
-                        type="range"
-                        name="replaceableDrivingByTransitPercentage"
-                        min="0"
-                        max="100"
-                        step="5"
-                        value={formData.replaceableDrivingByTransitPercentage}
-                        onChange={handleChange}
-                        className="w-[calc(100%-4rem)] align-middle"
-                        disabled={!drivesCar}
-                    />
-                    <span
-                        className="align-middle ml-2"
-                        style={{
-                            color: drivesCar ? "var(--foreground)" : "gray",
-                        }}
-                    >
-                        {drivesCar ? formData.replaceableDrivingByTransitPercentage : 0}%
-                    </span>
-
+                    <div className={`range-input ${drivesCar ? '' : 'disabled-range-input'}`}>
+                        <legend> What percentage of your driving can be replaced by public transit?</legend>
+                        <input
+                            type="range"
+                            name="replaceableDrivingByTransitPercentage"
+                            min="0"
+                            max="100"
+                            step="5"
+                            value={formData.replaceableDrivingByTransitPercentage}
+                            onChange={handleChange}
+                            disabled={!drivesCar}
+                        />
+                        <span>{drivesCar ? formData.replaceableDrivingByTransitPercentage : 0}%</span>
+                    </div>
                     {/* Checkbox for "I do not drive a car" */}
                     <label>
                         <input
@@ -348,7 +340,7 @@ export default function Home() {
                     {/* Willing to Give Up */}
                     <legend> What are you willing to give up to reduce your carbon footprint?</legend>
                     <input
-                        className={`border p-2 rounded-md`}
+                        className="input-base"
                         name="willingToGiveUp"
                         type="text"
                         value={formData.willingToGiveUp}
@@ -358,7 +350,7 @@ export default function Home() {
                     {/* Not Willing to Give Up */}
                     <legend> What are you NOT willing to give up to reduce your carbon footprint?</legend>
                     <input
-                        className={`border p-2 rounded-md`}
+                        className="input-base"
                         name="notWillingToGiveUp"
                         type="text"
                         value={formData.notWillingToGiveUp}
@@ -367,7 +359,6 @@ export default function Home() {
 
                     {/* Willing to Engage With */}
                     <legend> Would you be willing to engage with friends, family, or coworkers to reduce your climate impact?</legend>
-
                     {options.willingToEngageOptions.map((option) => (
                         <label key={option.value}>
                             <input
@@ -395,8 +386,8 @@ export default function Home() {
                         value={formData.groupGoals}
                         onChange={handleChange}
                     />
+                    
                     {/* Submit Button */}
-
                     <div>
                         <button type="submit" className="calc-btn">Submit</button>
                     </div>
