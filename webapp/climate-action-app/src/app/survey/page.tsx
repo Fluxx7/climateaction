@@ -49,7 +49,7 @@ export default function Home() {
     const [formData, setFormData] = useState({
         referredBy: "", // 
         inclinationToChange: "",
-        largestImpactChocie: "",
+        largestImpactChoice: "",
         carbonFootprint: 0,
         willingToChange: [] as string[],
         rankedWillingToChange: [
