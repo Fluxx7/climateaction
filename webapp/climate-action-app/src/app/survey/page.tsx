@@ -26,24 +26,6 @@ export default function Home() {
         initDatabase();
       }, []);
 
-    useEffect(() => {
-        // Trigger the database initialization when the page is loaded
-        const initDatabase = async () => {
-          try {
-            const response = await fetch('/api/init-db');
-            if (response.ok) {
-              console.log('Database initialized');
-            } else {
-              console.error('Error initializing database');
-            }
-          } catch (error) {
-            console.error('Error:', error);
-          }
-        };
-    
-        initDatabase();
-      }, []);
-
     const { formData, setFormData, errorMessages, handleChange } = useFormState();
     const [drivesCar, setDrivesCar] = useState(true); // Used for enabling the slider for replaceableDrivingByTransitPercentage
 
@@ -109,7 +91,7 @@ export default function Home() {
 
         if (!submissionData.drivesCar)
             submissionData.replaceableDrivingByTransitPercentage = 0; // If user does not drive, set replaceableDrivingByTransitPercentage to 0
-        
+
         // Remove otherReferralValue from submissionData, as it is not necessary to send to the database
         delete submissionData.otherReferralValue; 
         
