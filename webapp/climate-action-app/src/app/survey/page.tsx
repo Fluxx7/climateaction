@@ -58,12 +58,18 @@ export default function Home() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault(); // Prevent form reloading on submit
 
-        const submissionData = {...formData}; // Copy of formData
+        const submissionData: { [key: string]: any } = { ...formData }; // Copy of formData
 
         // Converts empty willingToEngageWith selection to "notOpen"
         if (submissionData.willingToEngageWith.length === 0)
             submissionData.willingToEngageWith = ["notOpen"];
-
+        
+        // Replaces referredBy with value from otherReferralValue if "Other" is selected
+        if (submissionData.referredBy === "Other") {    
+            submissionData.referredBy = submissionData.otherReferralValue;
+            delete submissionData.otherReferralValue; // Remove otherReferralValue from submissionData, as it is not necessary to send to the database
+        }
+        
         const response = await fetch('/api/submitForm', {
             method: 'POST',
             headers: {
