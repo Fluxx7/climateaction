@@ -58,12 +58,18 @@ export default function Home() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault(); // Prevent form reloading on submit
 
+        const submissionData = {...formData}; // Copy of formData
+
+        // Converts empty willingToEngageWith selection to "notOpen"
+        if (submissionData.willingToEngageWith.length === 0)
+            submissionData.willingToEngageWith = ["notOpen"];
+
         const response = await fetch('/api/submitForm', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(formData),
+            body: JSON.stringify(submissionData),
         });
 
         if (response.ok) {
@@ -89,9 +95,6 @@ export default function Home() {
             }
         } else {
             updated = current.filter((val) => val !== value);
-
-            if (updated.length === 0) // Converts empty selection into notOpen
-                updated = ["notOpen"];
         }
         
         setFormData(prev => ({ ...prev, willingToEngageWith: updated }));
