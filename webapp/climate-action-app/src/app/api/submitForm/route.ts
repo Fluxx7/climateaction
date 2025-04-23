@@ -26,6 +26,7 @@ export async function POST(req: Request) {
         );
         const submissionId = (submissionResult as mysql.ResultSetHeader).insertId;
 
+        // Not inserted into database yet
         const referredBy = body.referredBy;
         const otherReferralValue = body.otherReferralValue;
         
