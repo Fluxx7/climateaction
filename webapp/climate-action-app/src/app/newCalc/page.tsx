@@ -2,7 +2,7 @@
 
 // import Image from "next/image";
 import { useState, useRef, FormEvent } from "react";
-import calculate from "../calculator";
+import calculate from "./calculator";
 
 export default function Home() {
 
