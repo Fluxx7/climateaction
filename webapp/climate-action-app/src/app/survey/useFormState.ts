@@ -41,50 +41,52 @@ export function useFormState() {
     const handleChange = (e: React.ChangeEvent<any>) => {
 
         const { name, value, type } = e.target;
-        console.log(name, value, type);
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
+
+        // NON-NUMERICAL INPUT
+        if (type !== "number") {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
+
+            return;
+        }
+        // From here on, only deals with numerical fields (carbon footprint results)
+
+        // INVALID INPUT
+        if (value === "") {
+            setErrorMessages((prevMessages) => ({
+                ...prevMessages,
+                [name]: "Please enter a valid number.",
+            }));
+
+            // For whatever reason, this makes sure the input field keeps updating even if the input is invalid
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
+            return;
+        }
+
+
+        // VALID INPUT
+        setErrorMessages((prevMessages) => ({ // Clear relevant error if valid
+            ...prevMessages,
+            [name]: "", 
         }));
 
-        if (name === "airTravelFootprint" && value === "0") {
+        setFormData((prevData) => ({ // Update the form data with the new value
+            ...prevData,
+            [name]: type === "number" ? Number(value) : value,
+        }));
+
+        // If the air travel footprint is updated, set the air travel leisure percentage to 0 (makes database values less confusing)
+        if (name === "airtravelFootprint" && value === "0") 
             setFormData((prevData) => ({
                 ...prevData,
                 [name]: type === "number" ? Number(value) : value,
                 airTravelLeisurePercentage: 0,
             }));
-
-            setErrorMessages((prevMessages) => ({
-                ...prevMessages,
-                [name]: "", // Clear error if valid
-            }));
-            return;
-        }
-
-        if (e.target.type === "number") {
-            if (value === "") {
-                setErrorMessages((prevMessages) => ({
-                    ...prevMessages,
-                    [name]: "Please enter a valid number.",
-                }));
-                return;
-            } else {
-                setErrorMessages((prevMessages) => ({
-                    ...prevMessages,
-                    [name]: "", // Clear error if valid
-                }));
-
-                setFormData((prevData) => ({
-                    ...prevData,
-                    [name]: type === "number" ? Number(value) : value,
-                }));
-            }
-        } else {
-            setFormData((prevData) => ({
-                ...prevData,
-                [name]: value,
-            }));
-        }
     };
 
     return {
@@ -92,7 +94,7 @@ export function useFormState() {
         setFormData,
         errorMessages,
         handleChange,
-      };
+    };
 }
 
 interface FormData {
