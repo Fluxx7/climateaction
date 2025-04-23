@@ -103,10 +103,11 @@ export default function Home() {
             submissionData.willingToEngageWith = ["notOpen"];
         
         // Replaces referredBy with value from otherReferralValue if "Other" is selected
-        if (submissionData.referredBy === "Other") {    
+        if (submissionData.referredBy === "Other")
             submissionData.referredBy = submissionData.otherReferralValue;
-            delete submissionData.otherReferralValue; // Remove otherReferralValue from submissionData, as it is not necessary to send to the database
-        }
+
+        // Remove otherReferralValue from submissionData, as it is not necessary to send to the database
+        delete submissionData.otherReferralValue; 
         
         const response = await fetch('/api/submitForm', {
             method: 'POST',
