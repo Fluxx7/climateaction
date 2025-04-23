@@ -69,7 +69,6 @@ export function useFormState() {
             return;
         }
 
-
         // VALID INPUT
         setErrorMessages((prevMessages) => ({ // Clear relevant error if valid
             ...prevMessages,
