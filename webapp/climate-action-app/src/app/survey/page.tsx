@@ -78,7 +78,7 @@ export default function Home() {
         const { value, checked } = e.target;
         const current = formData.willingToEngageWith;
 
-        let updated: string[] = [];
+        let updated: string[];
 
         if (checked) {
             if (value === "notOpen") {
@@ -89,6 +89,9 @@ export default function Home() {
             }
         } else {
             updated = current.filter((val) => val !== value);
+
+            if (updated.length === 0) // Converts empty selection into notOpen
+                updated = ["notOpen"];
         }
         
         setFormData(prev => ({ ...prev, willingToEngageWith: updated }));
