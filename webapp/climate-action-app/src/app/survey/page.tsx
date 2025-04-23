@@ -9,7 +9,8 @@ import { initializeDatabase } from "../db/dbInit";
 export default function Home() {
 
     useEffect(() => {
-        // Trigger the database initialization when the page is loaded
+        
+        // Trigger the database initialization when the page is loaded (only initializes if it has not been initialized yet)
         const initDatabase = async () => {
           try {
             const response = await fetch('/api/init-db');
