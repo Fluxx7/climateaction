@@ -90,7 +90,7 @@ export default function Home() {
         } else {
             updated = current.filter((val) => val !== value);
         }
-
+        
         setFormData(prev => ({ ...prev, willingToEngageWith: updated }));
     };
 
@@ -386,7 +386,7 @@ export default function Home() {
                         value={formData.groupGoals}
                         onChange={handleChange}
                     />
-                    
+
                     {/* Submit Button */}
                     <div>
                         <button type="submit" className="calc-btn">Submit</button>

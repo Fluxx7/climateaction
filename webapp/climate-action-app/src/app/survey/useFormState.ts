@@ -98,25 +98,34 @@ export function useFormState() {
 }
 
 interface FormData {
-    referredBy: string; // Example: "family", "friends", etc.
-    otherReferralValue: string; // Free text input
-    inclinationToChange: string; // Example: "notInclined", "slightlyInclined", etc.
-    largestImpactChoice: string; // Example: "home", "electricity", etc.
-    totalCarbonFootprint: number; // Numeric input
-    airTravelFootprint: number; // Numeric input
-    homeFootprint: number; // Numeric input
-    groundTransportationFootprint: number; // Numeric input
-    dietFootprint: number; // Numeric input
-    electricityFootprint: number; // Numeric input
-    otherConsumptionFootprint: number; // Numeric input
-    airTravelLeisurePercentage: number; // Slider value (0-100)
-    goalToReduceAirTravel: string; // Free text input
-    drivesCar: boolean; // Checkbox value
-    replaceableDrivingByTransitPercentage: number; // Slider value (0-100)
-    ideasToImproveDiet: string; // Free text input
-    effortToBuyLocalFood: string; // Example: "yes", "no", "occasionally"
-    willingToGiveUp: string; // Example: "meat", "flying", etc.
+    
+    referredBy: string;             // Can be "family", "friends", "supervisorOrCoworker", or "Other"
+    otherReferralValue: string;     // If referredBy==="Other", this is the value
+    inclinationToChange: string;    // Example: "notInclined", "slightlyInclined", etc.
+    largestImpactChoice: string;    // Example: "home", "electricity", etc.
+    effortToBuyLocalFood: string;   // Example: "yes", "no", "occasionally"
+    willingToEngageWith: string[];  // Multi-select checkbox values. Example: ["friends", "family", "coworkers", "otherCommunities", "notOpen"]
+    
+    /* Carbon footprint results from external calculator */
+    totalCarbonFootprint: number; // Total combined footprint
+    airTravelFootprint: number;
+    homeFootprint: number;
+    groundTransportationFootprint: number;
+    dietFootprint: number;
+    electricityFootprint: number;
+    otherConsumptionFootprint: number;
+
+    airTravelLeisurePercentage: number; // Slider value, % of air travel that is for leisure (0%-100%)
+
+    replaceableDrivingByTransitPercentage: number;  // Slider value, % of driving that can be replaced by public transit (0%-100%)
+    
+    /* NOTE: Does not change the value of replaceableDrivingByTransitPercentage, just disables the slider. */
+    drivesCar: boolean; // If false, disables replaceableDrivingByTransitPercentage slider.
+
+    /* Open-ended responses */
+    goalToReduceAirTravel: string;
+    ideasToImproveDiet: string;
+    willingToGiveUp: string;
     notWillingToGiveUp: string; // Example: "meat", "flying", etc.
-    willingToEngageWith: string[]; // Multi-select checkbox values
     groupGoals: string; // Free text input
 }
