@@ -29,7 +29,7 @@ export async function POST(req: Request) {
         // Not inserted into database yet
         const referredBy = body.referredBy;
         const otherReferralValue = body.otherReferralValue;
-        
+
 
         // Loop through each key-value pair in the JSON object
         for (const [key, value] of Object.entries(body)) {
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
             const [formAnswerResult] = await db.execute(
                 `INSERT INTO FormAnswers (question_tag, answer, submission_id) VALUES (?, ?, ?)`,
                 [key, String(value), submissionId]
-              )
+            )
         }
 
         return NextResponse.json({

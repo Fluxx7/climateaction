@@ -72,7 +72,7 @@ export function useFormState() {
         // VALID INPUT
         setErrorMessages((prevMessages) => ({ // Clear relevant error if valid
             ...prevMessages,
-            [name]: "", 
+            [name]: "",
         }));
 
         setFormData((prevData) => ({ // Update the form data with the new value
@@ -81,7 +81,7 @@ export function useFormState() {
         }));
 
         // If the air travel footprint is updated, set the air travel leisure percentage to 0 (makes database values less confusing)
-        if (name === "airtravelFootprint" && value === "0") 
+        if (name === "airtravelFootprint" && value === "0")
             setFormData((prevData) => ({
                 ...prevData,
                 [name]: type === "number" ? Number(value) : value,
@@ -98,14 +98,14 @@ export function useFormState() {
 }
 
 interface FormData {
-    
+
     referredBy: string;             // Can be "family", "friends", "supervisorOrCoworker", or "Other"
     otherReferralValue: string;     // If referredBy==="Other", this is the value
     inclinationToChange: string;    // Example: "notInclined", "slightlyInclined", etc.
     largestImpactChoice: string;    // Example: "home", "electricity", etc.
     effortToBuyLocalFood: string;   // Example: "yes", "no", "occasionally"
     willingToEngageWith: string[];  // Multi-select checkbox values. Example: ["friends", "family", "coworkers", "otherCommunities", "notOpen"]
-    
+
     /* Carbon footprint results from external calculator */
     totalCarbonFootprint: number; // Total combined footprint
     airTravelFootprint: number;
@@ -118,7 +118,7 @@ interface FormData {
     airTravelLeisurePercentage: number; // Slider value, % of air travel that is for leisure (0%-100%)
 
     replaceableDrivingByTransitPercentage: number;  // Slider value, % of driving that can be replaced by public transit (0%-100%)
-    
+
     /* NOTE: Does not change the value of replaceableDrivingByTransitPercentage, just disables the slider. */
     drivesCar: boolean; // If false, disables replaceableDrivingByTransitPercentage slider.
 

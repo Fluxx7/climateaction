@@ -9,23 +9,23 @@ import { initializeDatabase } from "../db/dbInit";
 export default function Home() {
 
     useEffect(() => {
-        
+
         // Trigger the database initialization when the page is loaded (only initializes if it has not been initialized yet)
         const initDatabase = async () => {
-          try {
-            const response = await fetch('/api/init-db');
-            if (response.ok) {
-              console.log('Database initialized');
-            } else {
-              console.error('Error initializing database');
+            try {
+                const response = await fetch('/api/init-db');
+                if (response.ok) {
+                    console.log('Database initialized');
+                } else {
+                    console.error('Error initializing database');
+                }
+            } catch (error) {
+                console.error('Error:', error);
             }
-          } catch (error) {
-            console.error('Error:', error);
-          }
         };
-    
+
         initDatabase();
-      }, []);
+    }, []);
 
     const { formData, setFormData, errorMessages, handleChange } = useFormState();
     const [drivesCar, setDrivesCar] = useState(true); // Used for enabling the slider for replaceableDrivingByTransitPercentage
@@ -84,7 +84,7 @@ export default function Home() {
         // Converts empty willingToEngageWith selection to "notOpen"
         if (submissionData.willingToEngageWith.length === 0)
             submissionData.willingToEngageWith = ["notOpen"];
-        
+
         // Replaces referredBy with value from otherReferralValue if "Other" is selected
         if (submissionData.referredBy === "Other")
             submissionData.referredBy = submissionData.otherReferralValue;
@@ -94,8 +94,8 @@ export default function Home() {
             submissionData.replaceableDrivingByTransitPercentage = 0; // If user does not drive, set replaceableDrivingByTransitPercentage to 0
 
         // Remove otherReferralValue from submissionData, as it is not necessary to send to the database
-        delete submissionData.otherReferralValue; 
-        
+        delete submissionData.otherReferralValue;
+
         const response = await fetch('/api/submitForm', {
             method: 'POST',
             headers: {
@@ -128,7 +128,7 @@ export default function Home() {
         } else {
             updated = current.filter((val) => val !== value);
         }
-        
+
         setFormData(prev => ({ ...prev, willingToEngageWith: updated }));
     };
 
