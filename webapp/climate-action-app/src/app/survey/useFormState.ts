@@ -51,8 +51,8 @@ export function useFormState() {
 
             return;
         }
-        
-        // From here on, only deals with numerical fields (carbon footprint results)
+
+        /* From here on, only deals with numerical fields (carbon footprint results) */
 
         // INVALID INPUT
         if (value === "") {
