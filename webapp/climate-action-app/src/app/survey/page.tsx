@@ -106,6 +106,10 @@ export default function Home() {
         if (submissionData.referredBy === "Other")
             submissionData.referredBy = submissionData.otherReferralValue;
 
+
+        if (!submissionData.drivesCar)
+            submissionData.replaceableDrivingByTransitPercentage = 0; // If user does not drive, set replaceableDrivingByTransitPercentage to 0
+        
         // Remove otherReferralValue from submissionData, as it is not necessary to send to the database
         delete submissionData.otherReferralValue; 
         
