@@ -11,6 +11,7 @@ export default function Home() {
     const [drivesCar, setDrivesCar] = useState(true); // Used for enabling the slider for replaceableDrivingByTransitPercentage
     const [userConsent, setUserConsent] = useState(false); // State to manage user consent
     const [signature, setSignature] = useState(""); // State to manage user signature
+    const [submitted, setSubmitted] = useState(false); // State to manage form submission
 
     useEffect(() => {
 
@@ -122,6 +123,7 @@ export default function Home() {
 
         if (response.ok) {
             console.log('Form submitted successfully');
+            setSubmitted(true); // Set submitted to true to indicate form submission
         } else {
             console.error('Error submitting form');
         }
@@ -202,7 +204,7 @@ export default function Home() {
                     </div>
                 )}
 
-                {userConsent && (
+                {userConsent && !submitted && (
                     <form onSubmit={handleSubmit}>
 
                         {/* Referred By */}
@@ -494,6 +496,13 @@ export default function Home() {
                             <button type="submit" className="calc-btn">Submit</button>
                         </div>
                     </form>
+                )}
+
+                {submitted && (
+                    <div className="text-center">
+                        <h2 className="text-2xl font-bold mb-4">Thank you for your submission!</h2>
+                        <p>Your responses have been recorded.</p>
+                    </div>
                 )}
             </main>
         </div>
