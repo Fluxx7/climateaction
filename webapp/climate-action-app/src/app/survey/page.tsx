@@ -4,7 +4,6 @@
 import * as options from "./options";
 import { useFormState } from './useFormState';
 import { useEffect, useState } from "react";
-import { initializeDatabase } from "../db/dbInit";
 
 export default function Home() {
 
@@ -26,6 +25,7 @@ export default function Home() {
 
         initDatabase();
     }, []);
+
 
     const { formData, setFormData, errorMessages, handleChange } = useFormState();
     const [drivesCar, setDrivesCar] = useState(true); // Used for enabling the slider for replaceableDrivingByTransitPercentage
