@@ -1,259 +1,510 @@
 "use client";
 
-// import Image from "next/image";
-import { useState, useRef } from "react";
+import React from "react";
+import * as options from "./survey/options";
+import { useFormState } from './survey/useFormState';
+import { useEffect, useState } from "react";
 
 export default function Home() {
+    const [consentText, setConsentText] = useState<string[]>([]); // State to store the consent paragraph and final line
+    const { formData, setFormData, errorMessages, handleChange } = useFormState();
+    const [drivesCar, setDrivesCar] = useState(true); // Used for enabling the slider for replaceableDrivingByTransitPercentage
+    const [userConsent, setUserConsent] = useState(false); // State to manage user consent
+    const [signature, setSignature] = useState(""); // State to manage user signature
+    const [submitted, setSubmitted] = useState(false); // State to manage form submission
 
-  const [activeLang, setActiveLang] = useState("en"); // Active language
+    useEffect(() => {
 
-  const [usePrimaryEnIframe, setUsePrimaryEnIframe] = useState(true); // Determines which English iframe to use
-  const [usePrimaryDeIframe, setUsePrimaryDeIframe] = useState(true); // Determines which German iframe to use
+        // Trigger the database initialization when the page is loaded (only initializes if it has not been initialized yet)
+        const initDatabase = async () => {
+            try {
+                const response = await fetch('/api/init-db');
+                if (response.ok) {
+                    console.log('Database initialized');
+                } else {
+                    console.error('Error initializing database');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        };
 
-  const [enableRestartButton, setEnableRestartButton] = useState(true); // For temporarily disabling the restart button after its used
+        initDatabase();
 
-  // English iframe references
-  const enIframeRef = useRef<HTMLIFrameElement>(null);
-  const enIframeRefSecondary = useRef<HTMLIFrameElement>(null);
+        // Retrieve consent form from public/consentForm.txt
+        fetch("/consentForm.txt")
+            .then((res) => res.text())
+            .then((text) => {
+                const paragraphs = text.split(/\n\s*\n/).slice(0, 3);
 
-  // German iframe reference
-  const deIframeRef = useRef<HTMLIFrameElement>(null);
-  const deIframeRefSecondary = useRef<HTMLIFrameElement>(null);
-  
-  const restartIframe = (lang: string) => {
+                setConsentText(paragraphs);
+            })
+            .catch((err) => {
+                console.error("Failed to load consent form:", err);
+            });
+    }, []);
 
-    // Prevent the restart button from being clicked multiple times
-    if (!enableRestartButton)
-      return;
-    
-    // Switch iframe and restart previous one for future restarts
-    if (lang === "en" && enIframeRef.current && enIframeRefSecondary.current) {
-      if (usePrimaryEnIframe) {
-        setUsePrimaryEnIframe(false);
-        enIframeRef.current.src += "";
-      } else {
-        setUsePrimaryEnIframe(true);
-        enIframeRefSecondary.current.src += "";
-      }
 
-    } else if (lang === "de" && deIframeRef.current && deIframeRefSecondary.current) {
-      if (usePrimaryDeIframe) {
-        setUsePrimaryDeIframe(false);
-        deIframeRef.current.src += "";
-      } else {
-        setUsePrimaryDeIframe(true);
-        deIframeRefSecondary.current.src += "";
-      }
+
+
+    // Options for radio buttons for multiple choice questions
+    // Used for inclinationToChange, largestImpactChoice, effortToBuyLocalFood
+    type Option = {
+        value: string;
+        label: string;
+    };
+
+    // RadioGroup interface for rendering radio button groups
+    // This is used for inclinationToChange, largestImpactChoice, and effortToBuyLocalFood
+    interface RadioGroupProps {
+        name: string; // Name of the radio group (same as key in formData)
+        legend: string; // Question
+        options: Option[]; // Array of options for the radio buttons 
+        value: string; // Currently selected value (passed in from formData)
+        onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     }
 
-    setEnableRestartButton(false);
-    setTimeout(() => {
-      setEnableRestartButton(true);
-    }, 1000);
-  };
+    // RadioGroup component for rendering radio button groups
+    const RadioGroup = ({
+        name,
+        legend,
+        options,
+        value,
+        onChange
+    }: RadioGroupProps) => {
+        return (
+            <fieldset>
+                <legend>{legend}</legend>
+                {options.map((option) => (
+                    <label key={option.value}> {/* Label for each option from options */}
+                        {/* Radio button for each option */}
+                        <input
+                            type="radio"
+                            name={name} // Name of the radio group, matches the key in formData
+                            value={option.value} // Value of a specific option
+                            checked={value === option.value} // Compares selected value with value of current option
+                            onChange={onChange}
+                        />
+                        {option.label} {/* Label for the radio button */}
+                    </label>
+                ))}
+            </fieldset>
+        );
+    };
 
-  const swapIframe = (lang: string) => {
-    
-    // Does nothing if trying to swap to already active language
-    if (activeLang === lang)
-      return;
-    
-    if (lang === "de" && enIframeRef.current && enIframeRefSecondary.current) {
-      setActiveLang("de"); // Switches to German
+    // Handle form submission
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault(); // Prevent form reloading on submit
 
-      // Restarts the previous English iframe
-      if (usePrimaryEnIframe) {
-        enIframeRef.current.src += "";
-      } else {
-        enIframeRefSecondary.current.src += "";
-      }
-    } else if (lang === "en" && deIframeRef.current && deIframeRefSecondary.current) {
-      
-      setActiveLang("en"); // Switches to English
+        const submissionData: { [key: string]: any } = { ...formData }; // Copy of formData
 
-      // Restarts the previous German iframe
-      if (usePrimaryDeIframe) {
-        setUsePrimaryDeIframe(false);
-        deIframeRef.current.src += "";
-      } else {
-        setUsePrimaryDeIframe(true);
-        deIframeRefSecondary.current.src += "";
-      }
-    }
-  }
-  const reloadIframe = (lang: string) => {
-    if (lang === "en" && enIframeRef.current) {
-      enIframeRef.current.src += "";
-    } else if (lang === "de" && deIframeRef.current) {
-      deIframeRef.current.src += "";
-    }
-  };
+        // Converts empty willingToEngageWith selection to "notOpen"
+        if (submissionData.willingToEngageWith.length === 0)
+            submissionData.willingToEngageWith = ["notOpen"];
 
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <a href="/newCalc">
-        <button className="flex px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600" >Dev Calculator</button>
-      </a>
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        {/* Language toggle buttons and restart button */}
-        <div className="flex gap-4 mb-4">
-          <button
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-            onClick={() => swapIframe("en")}
-          >
-            English
-          </button>
-          <button
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-            onClick={() => swapIframe("de")}
-          >
-            Deutsche
-          </button>
+        // Replaces referredBy with value from otherReferralValue if "Other" is selected
+        if (submissionData.referredBy === "Other")
+            submissionData.referredBy = submissionData.otherReferralValue;
 
-          {/*Restart button*/}
-          <button 
-          className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-          onClick={() => {restartIframe(activeLang)}}
-          >
-            Restart
-          </button>
 
+        if (!submissionData.drivesCar)
+            submissionData.replaceableDrivingByTransitPercentage = 0; // If user does not drive, set replaceableDrivingByTransitPercentage to 0
+
+        // Remove otherReferralValue from submissionData, as it is not necessary to send to the database
+        delete submissionData.otherReferralValue;
+
+        const response = await fetch('/api/submitForm', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(submissionData),
+        });
+
+        if (response.ok) {
+            console.log('Form submitted successfully');
+            setSubmitted(true); // Set submitted to true to indicate form submission
+        } else {
+            console.error('Error submitting form');
+        }
+    };
+
+    // Multi-select mutual exclusivity logic for willingToEngageWith 
+    const handleEngageCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { value, checked } = e.target;
+        const current = formData.willingToEngageWith;
+
+        let updated: string[];
+
+        if (checked) {
+            if (value === "notOpen") {
+                updated = ["notOpen"];
+            } else {
+                updated = current.filter((val) => val !== "notOpen");
+                updated.push(value);
+            }
+        } else {
+            updated = current.filter((val) => val !== value);
+        }
+
+        setFormData(prev => ({ ...prev, willingToEngageWith: updated }));
+    };
+
+
+    // Function to handle textarea change
+    const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setSignature(e.target.value); // Update state with textarea value
+    };
+
+    // Function to handle the "Continue" button click
+    const continueToSurvey = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+
+        // Check if the response length is not 0 (after trimming whitespace)
+        if (signature.trim().length === 0) {
+            alert("Please provide your name before continuing.");
+            return; // Stop execution if the response is empty
+        }
+
+        setUserConsent(true);
+    };
+
+    // Multi-select mutual exclusivity logic for willingToChange
+    const isNotOpenSelected = formData.willingToEngageWith.includes("notOpen");
+    const isAnyOtherEngageSelected = formData.willingToEngageWith.some(val => val !== "notOpen");
+
+    return (
+        <div className="grid grid-rows-[1fr_20px] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+            <main style={{ width: "75%" }}>
+                {/* Logo at the top */}
+                <header className="logo-container mb-8">
+                    <img src="/wpilogo.png" alt="Logo" className="logo" />
+                </header>
+                {!userConsent && (
+                    <div>
+                        {consentText.map((para, index) => (
+                            <React.Fragment key={index}>
+                                <p className="mb-4">{para}</p>
+
+                                {/* Insert textbox between 2nd and 3rd paragraph */}
+                                {index === 1 && (
+                                    <div className="flex items-center">
+                                        <label htmlFor="response" className="mr-4">Name: </label>
+                                        <textarea id="response" name="response" className="border rounded-md p-2 mb-4" rows={1} cols={25} onChange={handleInputChange}></textarea>
+                                    </div>
+                                )}
+                            </React.Fragment>
+                        ))}
+
+                        <div className="flex flex-col justify-center items-center mb-4">
+                            <button onClick={continueToSurvey} className="calc-btn w-50">
+                                Continue
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {userConsent && !submitted && (
+                    <form onSubmit={handleSubmit}>
+
+                        {/* Referred By */}
+                        <fieldset>
+                            <legend >Who referred you to this survey?</legend>
+                            {options.referallOptions.map(option => (
+                                <label key={option.value}>
+                                    <input
+                                        type="radio"
+                                        name="referredBy"
+                                        value={option.value}
+                                        checked={formData.referredBy === option.value}
+                                        onChange={handleChange}
+                                    />
+                                    {option.label}
+                                </label>
+                            ))}
+                            <label className="inline-label">
+                                <input
+                                    type="radio"
+                                    name="referredBy"
+                                    value="Other"
+                                    onChange={handleChange}
+                                    checked={formData.referredBy === "Other"}
+                                />
+                                Other (please specify):
+                            </label>
+                            <input
+                                type="text"
+                                name="otherReferralValue"
+                                disabled={formData.referredBy !== 'Other'}
+                                value={formData.otherReferralValue}
+                                onChange={handleChange}
+                                className="border rounded-md p-2"
+                                style={{
+                                    color: formData.referredBy === 'Other' ? 'var(--foreground)' : 'gray',
+                                    borderColor: formData.referredBy === 'Other' ? 'white' : 'gray'
+                                }}
+                            />
+                        </fieldset>
+
+                        {/* Willing to Change */}
+                        {/* Inclination to Change */}
+                        <RadioGroup
+                            name="inclinationToChange"
+                            legend="How inclined do you feel to change your lifestyle choices to be more sustainable?"
+                            options={options.inclinationOptions}
+                            value={String(formData.inclinationToChange)}
+                            onChange={handleChange}
+                        />
+
+                        {/*Largest Impact Choice */}
+                        <RadioGroup
+                            name="largestImpactChoice"
+                            legend="Which of your lifestyle choices do you think has the largest impact on the environmenmt?"
+                            options={options.carbonFootprintCategories}
+                            value={String(formData.largestImpactChoice)}
+                            onChange={handleChange}
+                        />
+
+
+                        {/* Total Carbon Footprint */}
+                        <legend className="carbon-footprint-question">What is your carbon footprint?</legend>
+                        <p className="text-red-500 text-sm">
+                            {errorMessages.totalCarbonFootprint || "\u00A0"} { /* No-break-space character to maintain paragraph height for consistent formatting */}
+                        </p>
+                        <input
+                            className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
+                            name="totalCarbonFootprint"
+                            type="number"
+                            step="0.01"
+                            value={formData.totalCarbonFootprint}
+                            onChange={handleChange}
+                        />
+
+
+                        {/* Air Travel Footprint */}
+                        <legend className="carbon-footprint-question"> What is your carbon footprint for air travel?</legend>
+                        <p className="text-red-500 text-sm">
+                            {errorMessages.airTravelFootprint || "\u00A0"}
+                        </p>
+                        <input
+                            className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
+                            name="airTravelFootprint"
+                            type="number"
+                            step="0.01"
+                            value={formData.airTravelFootprint}
+                            onChange={handleChange}
+                        />
+
+                        {/* Home Footprint */}
+                        <legend className="carbon-footprint-question"> What is your carbon footprint for home?</legend>
+                        <p className="text-red-500 text-sm">
+                            {errorMessages.homeFootprint || "\u00A0"}
+                        </p>
+                        <input
+                            className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
+                            name="homeFootprint"
+                            type="number"
+                            step="0.01"
+                            value={formData.homeFootprint}
+                            onChange={handleChange}
+                        />
+
+                        {/* Ground Transportation Footprint */}
+                        <legend className="carbon-footprint-question"> What is your carbon footprint for ground transportation?</legend>
+                        <p className="text-red-500 text-sm">
+                            {errorMessages.groundTransportationFootprint || "\u00A0"}
+                        </p>
+                        <input
+                            className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
+                            name="groundTransportationFootprint"
+                            type="number"
+                            step="0.01"
+                            value={formData.groundTransportationFootprint}
+                            onChange={handleChange}
+                        />
+
+                        {/* Diet Footprint */}
+                        <legend className="carbon-footprint-question"> What is your carbon footprint for diet?</legend>
+                        <p className="text-red-500 text-sm">
+                            {errorMessages.dietFootprint || "\u00A0"}
+                        </p>
+                        <input
+                            className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
+                            name="dietFootprint"
+                            type="number"
+                            step="0.01"
+                            value={formData.dietFootprint}
+                            onChange={handleChange}
+                        />
+
+                        {/* Electricity Footprint */}
+                        <legend className="carbon-footprint-question"> What is your carbon footprint for electricity?</legend>
+                        <p className="text-red-500 text-sm">
+                            {errorMessages.electricityFootprint || "\u00A0"}
+                        </p>
+                        <input
+                            className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
+                            name="electricityFootprint"
+                            type="number"
+                            step="0.01"
+                            value={formData.electricityFootprint}
+                            onChange={handleChange}
+                        />
+
+                        {/* Other Consumption Footprint */}
+                        <legend className="carbon-footprint-question"> What is your carbon footprint for other consumption?</legend>
+                        <p className="text-red-500 text-sm">
+                            {errorMessages.otherConsumptionFootprint || "\u00A0"}
+                        </p>
+                        <input
+                            className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
+                            name="otherConsumptionFootprint"
+                            type="number"
+                            step="0.01"
+                            value={formData.otherConsumptionFootprint}
+                            onChange={handleChange}
+                        />
+
+                        {/* Air Travel Leisure Percentage */}
+                        {formData.airTravelFootprint !== 0 && (
+                            <div className="range-input">
+                                <legend>What percentage of your air travel is for leisure?</legend>
+                                <input
+                                    type="range"
+                                    name="airTravelLeisurePercentage"
+                                    min="0"
+                                    max="100"
+                                    step="5"
+                                    value={formData.airTravelLeisurePercentage}
+                                    onChange={handleChange}
+                                />
+                                <span>{formData.airTravelLeisurePercentage}%</span>
+                            </div>
+                        )}
+
+                        {/* Goal to Reduce Air Travel */}
+                        <legend> If possible, write a goal you can pursue to reduce your air travel: </legend>
+                        <textarea
+                            className="large-text-box"
+                            name="goalToReduceAirTravel"
+                            value={formData.goalToReduceAirTravel}
+                            onChange={handleChange}
+                        />
+                        className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
+                        {/* Replaceable Driving by Transit Percentage */}
+                        <div className={`range-input ${drivesCar ? '' : 'disabled-range-input'}`}>
+                            <legend> What percentage of your driving can be replaced by public transit?</legend>
+                            <input
+                                type="range"
+                                name="replaceableDrivingByTransitPercentage"
+                                min="0"
+                                max="100"
+                                step="5"
+                                value={formData.replaceableDrivingByTransitPercentage}
+                                onChange={handleChange}
+                                disabled={!drivesCar}
+                            />
+                            <span>{drivesCar ? formData.replaceableDrivingByTransitPercentage : 0}%</span>
+                        </div>
+                        {/* Checkbox for "I do not drive a car" */}
+                        <label>
+                            <input
+                                type="checkbox"
+                                name="drivesCar"
+                                checked={!drivesCar}
+                                onChange={(e) => {
+                                    setDrivesCar(!e.target.checked);
+                                    setFormData((prev) => ({
+                                        ...prev,
+                                        drivesCar: !drivesCar
+                                    }));
+                                }}
+                            />
+                            I do not drive a car.
+                        </label>
+
+                        {/* Ideas to Improve Diet */}
+                        <legend> Do you have any ideas to improve your diet for the future?</legend>
+                        <textarea
+                            className="large-text-box"
+                            name="ideasToImproveDiet"
+                            value={formData.ideasToImproveDiet}
+                            onChange={handleChange}
+                        />
+
+                        {/* Effort to Buy Local Food */}
+                        <RadioGroup
+                            name="effortToBuyLocalFood"
+                            legend="Do you make an effort to buy local food?"
+                            options={options.effortToBuyLocalFoodOptions}
+                            value={formData.effortToBuyLocalFood}
+                            onChange={handleChange}
+                        />
+
+                        {/* Willing to Give Up */}
+                        <legend> What are you willing to give up to reduce your carbon footprint?</legend>
+                        <input
+                            className="input-base"
+                            name="willingToGiveUp"
+                            type="text"
+                            value={formData.willingToGiveUp}
+                            onChange={handleChange}
+                        />
+
+                        {/* Not Willing to Give Up */}
+                        <legend> What are you NOT willing to give up to reduce your carbon footprint?</legend>
+                        <input
+                            className="input-base"
+                            name="notWillingToGiveUp"
+                            type="text"
+                            value={formData.notWillingToGiveUp}
+                            onChange={handleChange}
+                        />
+
+                        {/* Willing to Engage With */}
+                        <legend> Would you be willing to engage with friends, family, or coworkers to reduce your climate impact?</legend>
+                        {options.willingToEngageOptions.map((option) => (
+                            <label key={option.value}>
+                                <input
+                                    type="checkbox"
+                                    name="willingToEngageWith"
+                                    value={option.value}
+                                    disabled={(isNotOpenSelected && option.value !== "notOpen") || (isAnyOtherEngageSelected && option.value === "notOpen")}
+                                    checked={formData.willingToEngageWith.includes(option.value)}
+                                    onChange={(e) => handleEngageCheckboxChange(e)}
+                                />
+                                {option.label}
+                            </label>
+
+                        ))}
+
+                        {/* Group Goals */}
+                        <legend>
+                            Write 1-2 goals that you could pursue in a group or community to
+                            reduce your collective carbon footprints. (Example: "We will all
+                            take the S-Bahn to commute to work at least once a week" or
+                            "We won't fly on airplanes when we go on vacations together.") </legend>
+                        <textarea
+                            className="large-text-box"
+                            name="groupGoals"
+                            value={formData.groupGoals}
+                            onChange={handleChange}
+                        />
+
+                        {/* Submit Button */}
+                        <div>
+                            <button type="submit" className="calc-btn">Submit</button>
+                        </div>
+                    </form>
+                )}
+
+                {submitted && (
+                    <div className="text-center">
+                        <h2 className="text-2xl font-bold mb-4">Thank you for your submission!</h2>
+                        <p>Your responses have been recorded.</p>
+                    </div>
+                )}
+            </main>
         </div>
-
-        {/* English Iframe */}
-        <iframe
-          ref={enIframeRef}
-          width="710"
-          height="1300"
-          frameBorder="0"
-          scrolling="no"
-          src="https://calculator.carbonfootprint.com/calculator.aspx"
-          style={{display: activeLang === "en" && usePrimaryEnIframe? "block" : "none"}}
-        ></iframe>
-        <iframe
-          ref={enIframeRefSecondary}
-          width="710"
-          height="1300"
-          frameBorder="0"
-          scrolling="no"
-          src="https://calculator.carbonfootprint.com/calculator.aspx"
-          style={{display: activeLang === "en" && !usePrimaryEnIframe ? "block" : "none"}}
-        ></iframe>
-
-        {/* German Iframes */}
-        <iframe
-          ref={deIframeRef}
-          width="710"
-          height="1300"
-          frameBorder="0"
-          scrolling="no"
-          src="https://calculator.carbonfootprint.com/calculator.aspx?lang=de"
-          style={{display: activeLang === "de" && usePrimaryDeIframe? "block" : "none"}}
-        ></iframe>
-        <iframe
-          ref={deIframeRefSecondary}
-          width="710"
-          height="1300"
-          frameBorder="0"
-          scrolling="no"
-          src="https://calculator.carbonfootprint.com/calculator.aspx?lang=de"
-          style={{display: activeLang === "de" && !usePrimaryDeIframe ? "block" : "none"}}
-        ></iframe>
-        {/*Default node.js website content*/}
-        {/**<Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>*/}
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        {/**<a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>*/}
-      </footer>
-    </div>
-  );
+    );
 }
