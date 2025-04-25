@@ -1,9 +1,9 @@
 "use client";
 
-
 import * as options from "./options";
 import { useFormState } from './useFormState';
 import { useEffect, useState } from "react";
+import consentText from "./consentForm.txt";
 
 export default function Home() {
 
