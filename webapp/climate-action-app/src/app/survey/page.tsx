@@ -3,9 +3,11 @@
 import * as options from "./options";
 import { useFormState } from './useFormState';
 import { useEffect, useState } from "react";
-import consentText from "./consentForm.txt";
 
 export default function Home() {
+    const [consentText, setConsentText] = useState<string[]>([]); // State to store the consent paragraph and final line
+    const { formData, setFormData, errorMessages, handleChange } = useFormState();
+    const [drivesCar, setDrivesCar] = useState(true); // Used for enabling the slider for replaceableDrivingByTransitPercentage
 
     useEffect(() => {
 
@@ -24,11 +26,21 @@ export default function Home() {
         };
 
         initDatabase();
+
+        // Retrieve consent form from public/consentForm.txt
+        fetch("/consentForm.txt")
+            .then((res) => res.text())
+            .then((text) => {
+                const paragraphs = text.split(/\n\s*\n/).slice(0, 2);
+                setConsentText(paragraphs);
+            })
+            .catch((err) => {
+                console.error("Failed to load consent form:", err);
+            });
     }, []);
 
 
-    const { formData, setFormData, errorMessages, handleChange } = useFormState();
-    const [drivesCar, setDrivesCar] = useState(true); // Used for enabling the slider for replaceableDrivingByTransitPercentage
+    
 
     // Options for radio buttons for multiple choice questions
     // Used for inclinationToChange, largestImpactChoice, effortToBuyLocalFood
@@ -139,6 +151,15 @@ export default function Home() {
     return (
         <div className="grid grid-rows-[1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
             <main style={{ width: "75%" }}>
+                <p>
+                    {consentText[0]}
+                </p>
+                <br/>
+                <p>
+                    {consentText[1]}
+                </p>
+                <br/>
+                
                 <form onSubmit={handleSubmit}>
 
                     {/* Referred By */}
