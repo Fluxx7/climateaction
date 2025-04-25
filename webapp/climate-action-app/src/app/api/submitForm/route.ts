@@ -15,9 +15,8 @@ export async function POST(req: Request) {
         const body = await req.json();
         console.log(body);
 
-        const [userResult] = await db.execute(`INSERT INTO Users () VALUES ()`);
+        const [userResult] = await db.execute(`INSERT INTO Users (consent) VALUES (?)`, [body.consent]);
         const userId = (userResult as mysql.ResultSetHeader).insertId;
-
 
         // 2. Insert submission
         const [submissionResult] = await db.execute(
@@ -32,7 +31,7 @@ export async function POST(req: Request) {
 
 
         // Loop through each key-value pair in the JSON object
-        for (const [key, value] of Object.entries(body)) {
+        for (const [key, value] of Object.entries(body.data)) {
             if (key === 'referredBy' || key === 'otherReferralValue') {
                 // Skip these keys
                 continue;

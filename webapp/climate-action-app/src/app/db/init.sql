@@ -6,7 +6,8 @@ USE climate_action_app;
 -- This also allows a one-to-many-or-none relationship with submissions, which can't be done by the current survey but 
 -- future software could continue to use this database without needing to wipe it completely
 CREATE TABLE IF NOT EXISTS Users (
-    user_id INT AUTO_INCREMENT PRIMARY KEY
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    consent BOOLEAN NOT NULL
 );
 
 -- This ties all the answers given for a given submission together
@@ -14,7 +15,7 @@ CREATE TABLE IF NOT EXISTS Users (
 CREATE TABLE IF NOT EXISTS SurveySubmissions (
  id INT AUTO_INCREMENT PRIMARY KEY,
  user_id INT NOT NULL,
- FOREIGN KEY (user_id) REFERENCES Users(user_id)
+ FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
 -- This stores a single field result of a calculator submissions
@@ -25,7 +26,7 @@ CREATE TABLE IF NOT EXISTS CalculatorResults (
  result DECIMAL NOT NULL,
  submission_id INT NOT NULL,
  PRIMARY KEY (submission_id, field),
- FOREIGN KEY (submission_id) REFERENCES SurveySubmissions(id)
+ FOREIGN KEY (submission_id) REFERENCES SurveySubmissions(id) ON DELETE CASCADE
 );
 
 -- This stores a single field result of a calculator submissions
@@ -36,7 +37,7 @@ CREATE TABLE IF NOT EXISTS FormAnswers (
  answer VARCHAR(255) NOT NULL,
  submission_id INT NOT NULL,
  PRIMARY KEY (submission_id, question_tag),
- FOREIGN KEY (submission_id) REFERENCES SurveySubmissions(id)
+ FOREIGN KEY (submission_id) REFERENCES SurveySubmissions(id) ON DELETE CASCADE
 );
 
 -- Separate table to preserve privacy

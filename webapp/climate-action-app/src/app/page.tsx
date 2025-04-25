@@ -11,6 +11,7 @@ export default function Home() {
     const [drivesCar, setDrivesCar] = useState(true); // Used for enabling the slider for replaceableDrivingByTransitPercentage
     const [userConsent, setUserConsent] = useState(false); // State to manage user consent
     const [signature, setSignature] = useState(""); // State to manage user signature
+    const [pageNum, setPageNum] = useState(0);
     const [submitted, setSubmitted] = useState(false); // State to manage form submission
 
     useEffect(() => {
@@ -115,7 +116,7 @@ export default function Home() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(submissionData),
+            body: JSON.stringify({data: submissionData, consent: userConsent}),
         });
 
         if (response.ok) {
@@ -177,7 +178,8 @@ export default function Home() {
                 <header className="logo-container mb-8">
                     <img src="/wpilogo.png" alt="Logo" className="logo" />
                 </header>
-                {!userConsent && (
+                {!userConsent ? 
+                (
                     <div>
                         {consentText.map((para, index) => (
                             <React.Fragment key={index}>
@@ -199,15 +201,15 @@ export default function Home() {
                             </button>
                         </div>
                     </div>
-                )}
-
-                {userConsent && !submitted && (
+                ) 
+                :
+                 (!submitted ? (
                     <form onSubmit={handleSubmit}>
 
                         {/* Referred By */}
                         <fieldset>
                             <legend >Who referred you to this survey?</legend>
-                            {options.referallOptions.map(option => (
+                            {options.referralOptions.map(option => (
                                 <label key={option.value}>
                                     <input
                                         type="radio"
@@ -256,7 +258,7 @@ export default function Home() {
                         {/*Largest Impact Choice */}
                         <RadioGroup
                             name="largestImpactChoice"
-                            legend="Which of your lifestyle choices do you think has the largest impact on the environmenmt?"
+                            legend="Which of your lifestyle choices do you think has the largest impact on the environment?"
                             options={options.carbonFootprintCategories}
                             value={String(formData.largestImpactChoice)}
                             onChange={handleChange}
@@ -264,7 +266,7 @@ export default function Home() {
 
 
                         {/* Total Carbon Footprint */}
-                        <legend className="carbon-footprint-question">What is your carbon footprint?</legend>
+                        <legend className="carbon-footprint-question">What is your total carbon footprint in tons?</legend>
                         <p className="text-red-500 text-sm">
                             {errorMessages.totalCarbonFootprint || "\u00A0"} { /* No-break-space character to maintain paragraph height for consistent formatting */}
                         </p>
@@ -279,7 +281,7 @@ export default function Home() {
 
 
                         {/* Air Travel Footprint */}
-                        <legend className="carbon-footprint-question"> What is your carbon footprint for air travel?</legend>
+                        <legend className="carbon-footprint-question"> What is your carbon footprint for air travel in tons?</legend>
                         <p className="text-red-500 text-sm">
                             {errorMessages.airTravelFootprint || "\u00A0"}
                         </p>
@@ -293,7 +295,7 @@ export default function Home() {
                         />
 
                         {/* Home Footprint */}
-                        <legend className="carbon-footprint-question"> What is your carbon footprint for home?</legend>
+                        <legend className="carbon-footprint-question"> What is your carbon footprint for home in tons?</legend>
                         <p className="text-red-500 text-sm">
                             {errorMessages.homeFootprint || "\u00A0"}
                         </p>
@@ -307,7 +309,7 @@ export default function Home() {
                         />
 
                         {/* Ground Transportation Footprint */}
-                        <legend className="carbon-footprint-question"> What is your carbon footprint for ground transportation?</legend>
+                        <legend className="carbon-footprint-question"> What is your carbon footprint for ground transportation in tons?</legend>
                         <p className="text-red-500 text-sm">
                             {errorMessages.groundTransportationFootprint || "\u00A0"}
                         </p>
@@ -321,7 +323,7 @@ export default function Home() {
                         />
 
                         {/* Diet Footprint */}
-                        <legend className="carbon-footprint-question"> What is your carbon footprint for diet?</legend>
+                        <legend className="carbon-footprint-question"> What is your carbon footprint for diet in tons?</legend>
                         <p className="text-red-500 text-sm">
                             {errorMessages.dietFootprint || "\u00A0"}
                         </p>
@@ -335,7 +337,7 @@ export default function Home() {
                         />
 
                         {/* Electricity Footprint */}
-                        <legend className="carbon-footprint-question"> What is your carbon footprint for electricity?</legend>
+                        <legend className="carbon-footprint-question"> What is your carbon footprint for electricity in tons?</legend>
                         <p className="text-red-500 text-sm">
                             {errorMessages.electricityFootprint || "\u00A0"}
                         </p>
@@ -349,7 +351,7 @@ export default function Home() {
                         />
 
                         {/* Other Consumption Footprint */}
-                        <legend className="carbon-footprint-question"> What is your carbon footprint for other consumption?</legend>
+                        <legend className="carbon-footprint-question"> What is your carbon footprint for other consumption in tons?</legend>
                         <p className="text-red-500 text-sm">
                             {errorMessages.otherConsumptionFootprint || "\u00A0"}
                         </p>
@@ -493,14 +495,12 @@ export default function Home() {
                             <button type="submit" className="calc-btn">Submit</button>
                         </div>
                     </form>
-                )}
-
-                {submitted && (
+                ): (
                     <div className="text-center">
                         <h2 className="text-2xl font-bold mb-4">Thank you for your submission!</h2>
                         <p>Your responses have been recorded.</p>
                     </div>
-                )}
+                ))}
             </main>
         </div>
     );

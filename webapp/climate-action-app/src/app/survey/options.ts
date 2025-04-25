@@ -1,5 +1,5 @@
-// Referall options for the "Who referred you to this survey?" question
-export const referallOptions = [
+// Referral options for the "Who referred you to this survey?" question
+export const referralOptions = [
     { value: "family", label: "Family" },
     { value: "friends", label: "Friends" },
     { value: "supervisorOrCoworker", label: "Supervisor/Coworkers" },

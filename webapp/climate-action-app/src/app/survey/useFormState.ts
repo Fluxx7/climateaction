@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 export function useFormState() {
     // State to manage user's input into form
-    const [formData, setFormData] = useState<FormData>({
+    const [formData, setFormData] = useState<FormDataEntry>({
         referredBy: "", // 
         otherReferralValue: "",
         inclinationToChange: "",
@@ -97,7 +97,7 @@ export function useFormState() {
     };
 }
 
-interface FormData {
+interface FormDataEntry {
 
     referredBy: string;             // Can be "family", "friends", "supervisorOrCoworker", or "Other"
     otherReferralValue: string;     // If referredBy==="Other", this is the value
