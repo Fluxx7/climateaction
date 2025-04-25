@@ -44,9 +44,6 @@ export default function Home() {
             });
     }, []);
 
-
-
-
     // Options for radio buttons for multiple choice questions
     // Used for inclinationToChange, largestImpactChoice, effortToBuyLocalFood
     type Option = {
