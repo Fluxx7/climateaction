@@ -172,9 +172,12 @@ export default function Home() {
     const isAnyOtherEngageSelected = formData.willingToEngageWith.some(val => val !== "notOpen");
 
     return (
-        <div className="grid grid-rows-[1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+        <div className="grid grid-rows-[1fr_20px] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
             <main style={{ width: "75%" }}>
-
+                {/* Logo at the top */}
+                <header className="logo-container mb-8">
+                    <img src="/wpilogo.png" alt="Logo" className="logo" />
+                </header>
                 {!userConsent && (
                     <div>
                         {consentText.map((para, index) => (
