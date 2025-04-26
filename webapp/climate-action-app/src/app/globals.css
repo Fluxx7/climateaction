@@ -2,7 +2,7 @@
 
 :root {
   --background: #3b9191;
-  --foreground: #046534;
+  --foreground: #45aa77;
   --button-primary: var(--color-blue-500);
   --button-primary-hv: var(--color-blue-600);
 }
@@ -19,7 +19,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #116d6d;
-    --foreground: #45aa77;
+    --foreground: #046534;
     --text: #ffffff;
     --button-primary: var(--color-blue-800);
     --button-primary-hv: var(--color-blue-700);

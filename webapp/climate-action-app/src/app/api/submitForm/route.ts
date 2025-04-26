@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
+import { createClient } from '@supabase/supabase-js'
+
+// Create a single supabase client for interacting with your database
+const supabase = createClient('https://mqewhofkgjaphfnvafsb.supabase.co', '')
 
 // Create the connection to MySQL
 const db = await mysql.createConnection({

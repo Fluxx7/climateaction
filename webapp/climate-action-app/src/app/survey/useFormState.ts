@@ -1,5 +1,8 @@
 import { useCallback, useState } from 'react';
 
+// used for callbacks that aren't directly caused by a ChangeEvent
+export type EventSubmission = {target: {name: string, value: string | number | string[], type: string}};
+
 export function useFormState() {
     // State to manage user's input into form
     const [formData, setFormData] = useState<{ [key: string]: any }>({});
@@ -16,8 +19,7 @@ export function useFormState() {
     });
 
     // Handle form input changes
-    const handleChange = useCallback((e: React.ChangeEvent<any>) => {
-
+    const handleChange = useCallback((e: React.ChangeEvent<any> | EventSubmission) => {
         const { name, value, type } = e.target;
 
         // NON-NUMERICAL INPUT
