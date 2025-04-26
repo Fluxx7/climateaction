@@ -1,17 +1,14 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState } from "react";
 import * as options from "../survey/options";
-import { EventSubmission, useFormState } from "../survey/useFormState";
+import { useFormState } from "../survey/useFormState";
 import { RadioGroup, OpenQuestion, SliderQuestion, CheckboxGroup } from "./minorComponents";
 
 
 const SurveyForm = ({
     consent: userConsent
 }: {consent: boolean}) => {
-    const { formData, setFormData, errorMessages, handleChange } = useFormState();
-    const otherRef = useRef(""); // State to manage user signature
-    
-    const [drivesCar, setDrivesCar] = useState(true); // Used for enabling the slider for replaceableDrivingByTransitPercentage
-    const [pageNum, setPageNum] = useState(0);
+    const { formData, errorMessages, handleChange } = useFormState();
+    //const [pageNum, setPageNum] = useState(0);
     const [submitted, setSubmitted] = useState(false); // State to manage form submission
 
 
@@ -46,42 +43,17 @@ const SurveyForm = ({
         }
     };
 
-    // Multi-select mutual exclusivity logic for willingToEngageWith 
-    const handleEngageCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { value, checked } = e.target;
-        const current = formData.willingToEngageWith;
+    // const nextPage = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    //     e.preventDefault();
 
-        let updated: string[];
+    //     // Make sure all fields are answered
+    //     if (false) {
+    //         alert("Please answer all questions before continuing.");
+    //         return; // Stop execution if the response is empty
+    //     }
 
-        if (checked) {
-            if (value === "notOpen") {
-                updated = ["notOpen"];
-            } else {
-                updated = current.filter((val: any) => val !== "notOpen");
-                updated.push(value);
-            }
-        } else {
-            updated = current.filter((val: any) => val !== value);
-        }
-
-        setFormData(prev => ({ ...prev, willingToEngageWith: updated }));
-    };
-
-    const nextPage = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        e.preventDefault();
-
-        // Make sure all fields are answered
-        if (false) {
-            alert("Please answer all questions before continuing.");
-            return; // Stop execution if the response is empty
-        }
-
-        setPageNum(pageNum + 1);
-    };
-
-    // Multi-select mutual exclusivity logic for willingToChange
-    const isNotOpenSelected = formData.willingToEngageWith?.includes("notOpen");
-    const isAnyOtherEngageSelected = formData.willingToEngageWith?.some((val: any) => val !== "notOpen");
+    //     setPageNum(pageNum + 1);
+    // };
 
     return !submitted ? (
         <form onSubmit={handleSubmit}>

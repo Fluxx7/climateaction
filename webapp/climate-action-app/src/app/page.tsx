@@ -1,8 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
-import * as options from "./survey/options";
-import { useFormState } from './survey/useFormState';
+import React from "react";
 import { useEffect, useState } from "react";
 import SurveyForm from "./components/formComponent";
 import ConsentPage from "./components/consentComponent";

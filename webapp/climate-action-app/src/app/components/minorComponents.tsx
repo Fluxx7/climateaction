@@ -79,7 +79,7 @@ export const OpenQuestion = ({
                     style={{color: 'var(--text)',borderColor: 'white',background: 'var(--background)'}}
                     name={name}
                     value={value ?? ""}
-                    onChange={onChange}
+                    onChange={e => onChange({target: {name: e.target.name, value: e.target.value, type: e.target.type}})}
                 />)
                 : (<input
                     className={`input-base ${errorMessage ? 'input-error' : 'input-normal'}`}
@@ -88,7 +88,7 @@ export const OpenQuestion = ({
                     type={type}
                     value={value ?? ""}
                     step={step}
-                    onChange={onChange}
+                    onChange={e => onChange({target: {name: e.target.name, value: e.target.value, type: e.target.type}})}
                 />)}
         </div>
     );
@@ -97,43 +97,49 @@ export const OpenQuestion = ({
 
 
 // RadioGroup component for rendering radio button groups
-export const RadioGroup = (props: RadioGroupProps) => {
+export const RadioGroup = ({
+    name,
+    question,
+    className,
+    onChange,
+    options
+}: RadioGroupProps) => {
     const [selected, setSelected] = useState(""); // State to manage user signature
-    const [value, setValue] = useState<React.ChangeEvent>();
+    const [target, setTarget] = useState<{name: string, value: string | number | string[], type: string}>();
 
     // Manages the referral radio buttons
     useEffect(() => {
-        if (typeof value !== "undefined") {
-            props.onChange(value);
+        if (typeof target !== "undefined") {
+            onChange({target});
         }
-    }, [selected, value]);
+    }, [selected, target, onChange]);
 
     return (
-        <fieldset className={props.className + " outer-box"}>
+        <fieldset className={className + " outer-box"}>
             <p>
-                <legend className="carbon-footprint-question">{props.question}</legend>
+                <legend className="carbon-footprint-question">{question}</legend>
             </p>
-            {props.options.map((option) => (
-                <label key={props.name + "-" + option.value}> {/* Label for each option from options */}
+            {options.map((option) => (
+                <label key={name + "-" + option.value}> {/* Label for each option from options */}
                     {/* Radio button for each option */}
                     <input
                         type="radio"
-                        name={props.name} // Name of the radio group, matches the key in formData
+                        name={name} // Name of the radio group, matches the key in formData
                         value={option.value} // Value of a specific option
                         checked={selected === option.value} // Compares selected value with value of current option
                         onChange={e => {
                             setSelected(e.target.value);
                             if (!option.textValue) {
-                                setValue(e);
+                                setTarget({name: e.target.name, value: e.target.value, type: e.target.type});
                             }
                         }}
                     />
                     {option.label} {/* Label for the radio button */}
                     {option.textValue && <input
                         type="text"
-                        name={props.name}
+                        name={name}
                         disabled={selected !== option.value}
-                        onChange={e => setValue(e)}
+                        onChange={e => setTarget({name: e.target.name, value: e.target.value, type: e.target.type})}
                         className="border rounded-md p-2"
                         style={{
                             color: selected === option.value ? 'var(--text)' : 'gray',
@@ -184,16 +190,16 @@ export const SliderQuestion = (props: SliderQuestionProps) => {
 };
 
 // CheckboxGroup component for rendering checkbox questions
-export const CheckboxGroup = (props: CheckboxGroupProps) => {
+export const CheckboxGroup = ({name, onChange, options, className, question, }: CheckboxGroupProps) => {
     const [currGroups, setGroups] = useState<string[]>([]);
     const [selected, setSelected] = useState<[value: string, groups: string[] | undefined][]>([]);
 
     useEffect(() => {
         const output: EventSubmission = {
-            target: { name: props.name, value: selected.map((entry) => entry[0]), type: "checkbox" }
+            target: { name: name, value: selected.map((entry) => entry[0]), type: "checkbox" }
         };
-        props.onChange(output);
-    }, [selected])
+        onChange(output);
+    }, [name, selected, onChange])
 
     // Multi-select mutual exclusivity logic for willingToEngageWith 
     const handleCheckboxChange = (input: string, checked: boolean, exclusion_groups: string[] | undefined) => {
@@ -234,13 +240,13 @@ export const CheckboxGroup = (props: CheckboxGroupProps) => {
     };
 
     return (
-        <div className={props.className + " outer-box"}>
-            <legend className="carbon-footprint-question"> {props.question}</legend>
-            {props.options.map((option) => (
-                <label key={props.name + "-" + option.value}>
+        <div className={className + " outer-box"}>
+            <legend className="carbon-footprint-question"> {question}</legend>
+            {options.map((option) => (
+                <label key={name + "-" + option.value}>
                     <input
                         type="checkbox"
-                        name={props.name}
+                        name={name}
                         value={option.value}
                         disabled={ // disables the checkbox if it isn't part of any exclusion groups currently active
                             typeof option.exclusion_groups !== "undefined" ?

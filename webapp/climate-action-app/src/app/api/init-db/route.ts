@@ -7,7 +7,7 @@ export async function GET() {
       status: 200,
     });
   } catch (error) {
-    return new Response('Error initializing database', {
+    return new Response('Error initializing database: ' + error, {
       status: 500,
     });
   }
