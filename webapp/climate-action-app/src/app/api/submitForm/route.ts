@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
 import mysql from 'mysql2/promise';
+//import { createClient } from '@supabase/supabase-js'
+
+// Create a single supabase client for interacting with your database
+//const supabase = createClient('https://mqewhofkgjaphfnvafsb.supabase.co', '')
 
 // Create the connection to MySQL
 const db = await mysql.createConnection({
@@ -26,8 +30,8 @@ export async function POST(req: Request) {
         const submissionId = (submissionResult as mysql.ResultSetHeader).insertId;
 
         // Not inserted into database yet
-        const referredBy = body.referredBy;
-        const otherReferralValue = body.otherReferralValue;
+        // const referredBy = body.referredBy;
+        // const otherReferralValue = body.otherReferralValue;
 
 
         // Loop through each key-value pair in the JSON object
@@ -40,6 +44,7 @@ export async function POST(req: Request) {
                 `INSERT INTO FormAnswers (question_tag, answer, submission_id) VALUES (?, ?, ?)`,
                 [key, String(value), submissionId]
             )
+            console.log(formAnswerResult);
         }
 
         return NextResponse.json({
