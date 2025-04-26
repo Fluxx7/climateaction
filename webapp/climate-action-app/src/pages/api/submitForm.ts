@@ -21,6 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
 
             const userId = userData.user_id;
+            const refTag: string = body.referrerTag;
 
             // 2. Insert submission
             const { data: submissionData, error: submissionError } = await supabase
@@ -35,6 +36,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
 
             const submissionId = submissionData.id;
+
+            const maxTagValue = 100000;
+            const userTag = Math.floor(Math.random() * maxTagValue) + 1;
+            const referral = Object.entries(body.data)
+                .filter(([key]) => key === 'referredBy')
+                .map(([value]) => ({
+                    referrer_tag: Number(refTag),
+                    relationship: value,
+                    user_tag: userTag
+                }));
+            if (referral.length > 0) {
+                const { error: refAnswersError } = await supabase
+                    .from('referrals')
+                    .insert(referral);
+
+                if (refAnswersError) {
+                    console.error('Referral insert error:', refAnswersError);
+                    throw refAnswersError;
+                }
+            }
+            
 
             // 3. Insert form answers
             const formAnswers = Object.entries(body.data)
@@ -60,6 +82,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 message: 'Form submitted and saved to DB!',
                 userId,
                 submissionId,
+                tag: userTag
             });
         } catch (error: any) {
             // Log the entire error object for more details

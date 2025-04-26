@@ -2,15 +2,20 @@ import React, { useState } from "react";
 import * as options from "../survey/options";
 import { useFormState } from "../survey/useFormState";
 import { RadioGroup, OpenQuestion, SliderQuestion, CheckboxGroup } from "./minorComponents";
+import { useSearchParams } from "next/navigation";
 
 
 const SurveyForm = ({
     consent: userConsent
 }: {consent: boolean}) => {
     const { formData, errorMessages, handleChange } = useFormState();
+    const [ userTag, setUserTag ] = useState("");
+    const searchParams = useSearchParams();
     //const [pageNum, setPageNum] = useState(0);
     const [submitted, setSubmitted] = useState(false); // State to manage form submission
 
+    const referrerTag = searchParams?.get('rftg') ?? "0";
+    
 
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
@@ -32,12 +37,15 @@ const SurveyForm = ({
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ data: submissionData, consent: userConsent }),
+            body: JSON.stringify({ data: submissionData, consent: userConsent, referrerTag: referrerTag}),
         });
 
         if (response.ok) {
             console.log('Form submitted successfully');
             setSubmitted(true); // Set submitted to true to indicate form submission
+            const data = await response.json();
+            setUserTag(data.tag);
+
         } else {
             console.error('Error submitting form');
         }
@@ -256,9 +264,11 @@ const SurveyForm = ({
                 <button type="submit" className="calc-btn">Submit</button>
             </div>
         </form>) : (
-        <div className="text-center">
+        <div className="text-center flex flex-col">
             <h2 className="text-2xl font-bold mb-4">Thank you for your submission!</h2>
             <p>Your responses have been recorded.</p>
+            <p>Want to share this survey? Use this link:</p>
+            <input className="outer-box justify-center" readOnly value={`${window.location.origin}/?rftg=${userTag}`}/>
         </div>);
 };
 
