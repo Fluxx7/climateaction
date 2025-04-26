@@ -1,45 +1,48 @@
+import supabase from '@/app/db/dbInit';
 import { NextResponse } from 'next/server';
-import mysql from 'mysql2/promise';
 
-// Create the connection to MySQL
-const db = await mysql.createConnection({
-    host: 'localhost', // Or your DB host
-    user: 'root', // Or your DB user
-    password: '', // Or your DB password
-    database: 'climate_action_app', // Database name
-});
 
 export async function POST(req: Request) {
     try {
-
         const body = await req.json();
         console.log(body);
 
-        const [userResult] = await db.execute(`INSERT INTO Users (consent) VALUES (?)`, [body.consent]);
-        const userId = (userResult as mysql.ResultSetHeader).insertId;
+        // 1. Insert user and get the ID
+        console.log("Starting Supabase operations");
+        const { data: userData, error: userError } = await supabase
+            .from('Users')
+            .insert({ consent: body.consent })
+            .select('user_id')
+            .single();
+
+        if (userError) throw userError;
+        const userId = userData.user_id;
 
         // 2. Insert submission
-        const [submissionResult] = await db.execute(
-            `INSERT INTO SurveySubmissions (user_id) VALUES (?)`,
-            [userId]
-        );
-        const submissionId = (submissionResult as mysql.ResultSetHeader).insertId;
+        const { data: submissionData, error: submissionError } = await supabase
+            .from('SurveySubmissions')
+            .insert({ user_id: userId })
+            .select('id')
+            .single();
 
-        // Not inserted into database yet
-        const referredBy = body.referredBy;
-        const otherReferralValue = body.otherReferralValue;
+        if (submissionError) throw submissionError;
+        const submissionId = submissionData.id;
 
+        // 3. Insert form answers
+        const formAnswers = Object.entries(body.data)
+            .filter(([key]) => key !== 'referredBy' && key !== 'otherReferralValue')
+            .map(([key, value]) => ({
+                question_tag: key,
+                answer: String(value),
+                submission_id: submissionId
+            }));
 
-        // Loop through each key-value pair in the JSON object
-        for (const [key, value] of Object.entries(body.data)) {
-            if (key === 'referredBy' || key === 'otherReferralValue') {
-                // Skip these keys
-                continue;
-            }
-            const [formAnswerResult] = await db.execute(
-                `INSERT INTO FormAnswers (question_tag, answer, submission_id) VALUES (?, ?, ?)`,
-                [key, String(value), submissionId]
-            )
+        if (formAnswers.length > 0) {
+            const { error: formAnswersError } = await supabase
+                .from('FormAnswers')
+                .insert(formAnswers);
+
+            if (formAnswersError) throw formAnswersError;
         }
 
         return NextResponse.json({
@@ -48,7 +51,21 @@ export async function POST(req: Request) {
             submissionId,
         });
     } catch (error: any) {
-        console.error('Error in /api route:', error);
-        return NextResponse.json({ message: 'Internal Server Error', error: error.message }, { status: 500 });
+        // More detailed error logging
+        console.error('Error in /api route:', error.message || error);
+        console.error('Error stack:', error.stack);
+
+        if (error.code) {
+            console.error('Error code:', error.code);
+        }
+
+        if (error.details) {
+            console.error('Error details:', error.details);
+        }
+
+        return NextResponse.json(
+            { message: 'Internal Server Error', error: error.message || 'Unknown error' },
+            { status: 500 }
+        );
     }
 }
