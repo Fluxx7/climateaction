@@ -1,13 +1,16 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import * as options from "./survey/options";
 import { useFormState } from './survey/useFormState';
 import { useEffect, useState } from "react";
+import * as pages from "./survey/pageStates";
 
 export default function Home() {
     const [consentText, setConsentText] = useState<string[]>([]); // State to store the consent paragraph and final line
     const { formData, setFormData, errorMessages, handleChange } = useFormState();
+    const otherRef = useRef(""); // State to manage user signature
+    const [refBy, setRefBy] = useState(""); // State to manage user signature
     const [drivesCar, setDrivesCar] = useState(true); // Used for enabling the slider for replaceableDrivingByTransitPercentage
     const [userConsent, setUserConsent] = useState(false); // State to manage user consent
     const [signature, setSignature] = useState(""); // State to manage user signature
@@ -45,22 +48,53 @@ export default function Home() {
             });
     }, []);
 
-    // Options for radio buttons for multiple choice questions
-    // Used for inclinationToChange, largestImpactChoice, effortToBuyLocalFood
-    type Option = {
-        value: string;
-        label: string;
+    // Manages the referral radio buttons
+    useEffect(() => {
+        setFormData((prevData) => ({
+            ...prevData,
+            "referredBy": refBy === "Other" ? otherRef : refBy,
+            }));
+    }, [refBy, otherRef]);
+
+   
+
+    const OpenQuestion = ({
+        name,
+        question,
+        size,
+        type,
+        value,
+        className,
+        step,
+        errorMessage,
+        onChange
+    }: pages.InputQuestionProps) => {
+        return (
+        <div className={className}>
+            <legend className="carbon-footprint-question font-bold">{question}</legend>
+            <p className="text-red-500 text-sm">
+                {errorMessage || "\u00A0"} { /* No-break-space character to maintain paragraph height for consistent formatting */}
+            </p>
+            {size === "large" ? 
+                (<textarea
+                    className= {`large-text-box input-base ${errorMessage ? "input-error" : "input-normal"}`}
+                    name={name}
+                    value={value}
+                    onChange={onChange}
+                />) 
+                : (<input
+                    className={`input-base ${errorMessage ? 'input-error' : 'input-normal'}`}
+                    name={name}
+                    type={type}
+                    value={value}
+                    step={step}
+                    onChange={onChange}
+                />)}
+        </div>
+        );
     };
 
-    // RadioGroup interface for rendering radio button groups
-    // This is used for inclinationToChange, largestImpactChoice, and effortToBuyLocalFood
-    interface RadioGroupProps {
-        name: string; // Name of the radio group (same as key in formData)
-        legend: string; // Question
-        options: Option[]; // Array of options for the radio buttons 
-        value: string; // Currently selected value (passed in from formData)
-        onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    }
+    
 
     // RadioGroup component for rendering radio button groups
     const RadioGroup = ({
@@ -68,13 +102,14 @@ export default function Home() {
         legend,
         options,
         value,
-        onChange
-    }: RadioGroupProps) => {
+        className,
+        onChange,
+    }: pages.RadioGroupProps) => {
         return (
-            <fieldset>
-                <legend>{legend}</legend>
+            <fieldset className={className}>
+                <legend className="font-bold">{legend}</legend>
                 {options.map((option) => (
-                    <label key={option.value}> {/* Label for each option from options */}
+                    <label key={name + "-" + option.value}> {/* Label for each option from options */}
                         {/* Radio button for each option */}
                         <input
                             type="radio"
@@ -97,19 +132,12 @@ export default function Home() {
         const submissionData: { [key: string]: any } = { ...formData }; // Copy of formData
 
         // Converts empty willingToEngageWith selection to "notOpen"
-        if (submissionData.willingToEngageWith.length === 0)
+        if (submissionData.willingToEngageWith?.length === 0)
             submissionData.willingToEngageWith = ["notOpen"];
-
-        // Replaces referredBy with value from otherReferralValue if "Other" is selected
-        if (submissionData.referredBy === "Other")
-            submissionData.referredBy = submissionData.otherReferralValue;
 
 
         if (!submissionData.drivesCar)
             submissionData.replaceableDrivingByTransitPercentage = 0; // If user does not drive, set replaceableDrivingByTransitPercentage to 0
-
-        // Remove otherReferralValue from submissionData, as it is not necessary to send to the database
-        delete submissionData.otherReferralValue;
 
         const response = await fetch('/api/submitForm', {
             method: 'POST',
@@ -138,11 +166,11 @@ export default function Home() {
             if (value === "notOpen") {
                 updated = ["notOpen"];
             } else {
-                updated = current.filter((val) => val !== "notOpen");
+                updated = current.filter((val: any) => val !== "notOpen");
                 updated.push(value);
             }
         } else {
-            updated = current.filter((val) => val !== value);
+            updated = current.filter((val: any) => val !== value);
         }
 
         setFormData(prev => ({ ...prev, willingToEngageWith: updated }));
@@ -167,9 +195,21 @@ export default function Home() {
         setUserConsent(true);
     };
 
+    const nextPage = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+
+        // Make sure all fields are answered
+        if (false) { 
+            alert("Please answer all questions before continuing.");
+            return; // Stop execution if the response is empty
+        }
+
+        setPageNum(pageNum+1);
+    }
+
     // Multi-select mutual exclusivity logic for willingToChange
-    const isNotOpenSelected = formData.willingToEngageWith.includes("notOpen");
-    const isAnyOtherEngageSelected = formData.willingToEngageWith.some(val => val !== "notOpen");
+    const isNotOpenSelected = formData.willingToEngageWith?.includes("notOpen");
+    const isAnyOtherEngageSelected = formData.willingToEngageWith?.some((val:any) => val !== "notOpen");
 
     return (
         <div className="grid grid-rows-[1fr_20px] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
@@ -207,47 +247,46 @@ export default function Home() {
                     <form onSubmit={handleSubmit}>
 
                         {/* Referred By */}
-                        <fieldset>
-                            <legend >Who referred you to this survey?</legend>
+                        <fieldset className="outer-box">
+                            <legend className="font-bold">Who referred you to this survey?</legend>
                             {options.referralOptions.map(option => (
-                                <label key={option.value}>
+                                <label key={"referredBy-"+option.value}>
                                     <input
                                         type="radio"
                                         name="referredBy"
                                         value={option.value}
-                                        checked={formData.referredBy === option.value}
-                                        onChange={handleChange}
+                                        onChange={e => setRefBy(e.target.value)}
                                     />
                                     {option.label}
                                 </label>
                             ))}
-                            <label className="inline-label">
+                            <label className="inline-flex">
                                 <input
                                     type="radio"
                                     name="referredBy"
                                     value="Other"
-                                    onChange={handleChange}
-                                    checked={formData.referredBy === "Other"}
+                                    onChange={e => setRefBy(e.target.value)}
                                 />
                                 Other (please specify):
+                                <input
+                                    type="text"
+                                    name="otherReferralValue"
+                                    disabled={refBy !== 'Other'}
+                                    onChange={e => otherRef.current = e.target.value}
+                                    className="border rounded-md p-2"
+                                    style={{
+                                        color: refBy === 'Other' ? 'var(--text)' : 'gray',
+                                        borderColor: refBy === 'Other' ? 'white' : 'gray',
+                                        background: refBy === 'Other' ? 'var(--background)' :  '#045656'
+                                    }}
+                                />
                             </label>
-                            <input
-                                type="text"
-                                name="otherReferralValue"
-                                disabled={formData.referredBy !== 'Other'}
-                                value={formData.otherReferralValue}
-                                onChange={handleChange}
-                                className="border rounded-md p-2"
-                                style={{
-                                    color: formData.referredBy === 'Other' ? 'var(--foreground)' : 'gray',
-                                    borderColor: formData.referredBy === 'Other' ? 'white' : 'gray'
-                                }}
-                            />
+                            
                         </fieldset>
 
                         {/* Willing to Change */}
                         {/* Inclination to Change */}
-                        <RadioGroup
+                        <RadioGroup className="outer-box"
                             name="inclinationToChange"
                             legend="How inclined do you feel to change your lifestyle choices to be more sustainable?"
                             options={options.inclinationOptions}
@@ -256,7 +295,7 @@ export default function Home() {
                         />
 
                         {/*Largest Impact Choice */}
-                        <RadioGroup
+                        <RadioGroup className="outer-box"
                             name="largestImpactChoice"
                             legend="Which of your lifestyle choices do you think has the largest impact on the environment?"
                             options={options.carbonFootprintCategories}
@@ -266,102 +305,88 @@ export default function Home() {
 
 
                         {/* Total Carbon Footprint */}
-                        <legend className="carbon-footprint-question">What is your total carbon footprint in tons?</legend>
-                        <p className="text-red-500 text-sm">
-                            {errorMessages.totalCarbonFootprint || "\u00A0"} { /* No-break-space character to maintain paragraph height for consistent formatting */}
-                        </p>
-                        <input
-                            className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
-                            name="totalCarbonFootprint"
-                            type="number"
+                        <OpenQuestion className="outer-box"
+                            name="totalCarbonFootprint" 
+                            question="What is your total carbon footprint in tons?" 
+                            size="small" 
+                            type="number" 
+                            value={formData.totalCarbonFootprint} 
                             step="0.01"
-                            value={formData.totalCarbonFootprint}
-                            onChange={handleChange}
+                            errorMessage={errorMessages.totalCarbonFootprint}
+                            onChange={handleChange}                            
                         />
 
 
                         {/* Air Travel Footprint */}
-                        <legend className="carbon-footprint-question"> What is your carbon footprint for air travel in tons?</legend>
-                        <p className="text-red-500 text-sm">
-                            {errorMessages.airTravelFootprint || "\u00A0"}
-                        </p>
-                        <input
-                            className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
-                            name="airTravelFootprint"
-                            type="number"
+                        <OpenQuestion className="outer-box"
+                            name="airTravelFootprint" 
+                            question="What is your carbon footprint for air travel in tons?" 
+                            size="small" 
+                            type="number" 
+                            value={formData.airTravelFootprint} 
                             step="0.01"
-                            value={formData.airTravelFootprint}
-                            onChange={handleChange}
+                            errorMessage={errorMessages.totalCarbonFootprint}
+                            onChange={handleChange}                            
                         />
 
                         {/* Home Footprint */}
-                        <legend className="carbon-footprint-question"> What is your carbon footprint for home in tons?</legend>
-                        <p className="text-red-500 text-sm">
-                            {errorMessages.homeFootprint || "\u00A0"}
-                        </p>
-                        <input
-                            className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
-                            name="homeFootprint"
-                            type="number"
+                        <OpenQuestion className="outer-box"
+                            name="homeFootprint" 
+                            question="What is your carbon footprint for home in tons?" 
+                            size="small" 
+                            type="number" 
+                            value={formData.homeFootprint} 
                             step="0.01"
-                            value={formData.homeFootprint}
-                            onChange={handleChange}
+                            errorMessage={errorMessages.homeFootprint}
+                            onChange={handleChange}                            
                         />
 
                         {/* Ground Transportation Footprint */}
-                        <legend className="carbon-footprint-question"> What is your carbon footprint for ground transportation in tons?</legend>
-                        <p className="text-red-500 text-sm">
-                            {errorMessages.groundTransportationFootprint || "\u00A0"}
-                        </p>
-                        <input
-                            className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
-                            name="groundTransportationFootprint"
-                            type="number"
+                        <OpenQuestion className="outer-box"
+                            name="groundTransportationFootprint" 
+                            question="What is your carbon footprint for ground transportation in tons?" 
+                            size="small" 
+                            type="number" 
+                            value={formData.groundTransportationFootprint} 
                             step="0.01"
-                            value={formData.groundTransportationFootprint}
-                            onChange={handleChange}
+                            errorMessage={errorMessages.groundTransportationFootprint}
+                            onChange={handleChange}                            
                         />
 
                         {/* Diet Footprint */}
-                        <legend className="carbon-footprint-question"> What is your carbon footprint for diet in tons?</legend>
-                        <p className="text-red-500 text-sm">
-                            {errorMessages.dietFootprint || "\u00A0"}
-                        </p>
-                        <input
-                            className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
-                            name="dietFootprint"
-                            type="number"
+                        <OpenQuestion className="outer-box"
+                            name="dietFootprint" 
+                            question="What is your carbon footprint for diet in tons?" 
+                            size="small" 
+                            type="number" 
+                            value={formData.dietFootprint} 
                             step="0.01"
-                            value={formData.dietFootprint}
-                            onChange={handleChange}
+                            errorMessage={errorMessages.dietFootprint}
+                            onChange={handleChange}                            
                         />
 
                         {/* Electricity Footprint */}
-                        <legend className="carbon-footprint-question"> What is your carbon footprint for electricity in tons?</legend>
-                        <p className="text-red-500 text-sm">
-                            {errorMessages.electricityFootprint || "\u00A0"}
-                        </p>
-                        <input
-                            className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
-                            name="electricityFootprint"
-                            type="number"
+                        <OpenQuestion className="outer-box"
+                            name="electricityFootprint" 
+                            question="What is your carbon footprint for electricity in tons?" 
+                            size="small" 
+                            type="number" 
+                            value={formData.electricityFootprint} 
                             step="0.01"
-                            value={formData.electricityFootprint}
-                            onChange={handleChange}
+                            errorMessage={errorMessages.electricityFootprint}
+                            onChange={handleChange}                            
                         />
 
                         {/* Other Consumption Footprint */}
-                        <legend className="carbon-footprint-question"> What is your carbon footprint for other consumption in tons?</legend>
-                        <p className="text-red-500 text-sm">
-                            {errorMessages.otherConsumptionFootprint || "\u00A0"}
-                        </p>
-                        <input
-                            className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
-                            name="otherConsumptionFootprint"
-                            type="number"
+                        <OpenQuestion className="outer-box"
+                            name="otherConsumptionFootprint" 
+                            question="What is your carbon footprint for other consumption in tons?" 
+                            size="small" 
+                            type="number" 
+                            value={formData.otherConsumptionFootprint} 
                             step="0.01"
-                            value={formData.otherConsumptionFootprint}
-                            onChange={handleChange}
+                            errorMessage={errorMessages.otherConsumptionFootprint}
+                            onChange={handleChange}                            
                         />
 
                         {/* Air Travel Leisure Percentage */}
@@ -381,15 +406,16 @@ export default function Home() {
                             </div>
                         )}
 
+                        
                         {/* Goal to Reduce Air Travel */}
-                        <legend> If possible, write a goal you can pursue to reduce your air travel: </legend>
-                        <textarea
-                            className="large-text-box"
-                            name="goalToReduceAirTravel"
+                        <OpenQuestion className="outer-box"
+                            name="goalToReduceAirTravel" 
+                            question="If possible, write a goal you can pursue to reduce your air travel:" 
+                            size="large" 
                             value={formData.goalToReduceAirTravel}
-                            onChange={handleChange}
+                            onChange={handleChange}                            
                         />
-                        className={`input-base ${errorMessages.totalCarbonFootprint ? 'input-error' : 'input-normal'}`}
+                        
                         {/* Replaceable Driving by Transit Percentage */}
                         <div className={`range-input ${drivesCar ? '' : 'disabled-range-input'}`}>
                             <legend> What percentage of your driving can be replaced by public transit?</legend>
@@ -410,7 +436,7 @@ export default function Home() {
                             <input
                                 type="checkbox"
                                 name="drivesCar"
-                                checked={!drivesCar}
+                                //checked={!drivesCar}
                                 onChange={(e) => {
                                     setDrivesCar(!e.target.checked);
                                     setFormData((prev) => ({
@@ -423,16 +449,16 @@ export default function Home() {
                         </label>
 
                         {/* Ideas to Improve Diet */}
-                        <legend> Do you have any ideas to improve your diet for the future?</legend>
-                        <textarea
-                            className="large-text-box"
-                            name="ideasToImproveDiet"
+                        <OpenQuestion className="outer-box"
+                            name="ideasToImproveDiet" 
+                            question="Do you have any ideas to improve your diet for the future?" 
+                            size="large" 
                             value={formData.ideasToImproveDiet}
-                            onChange={handleChange}
+                            onChange={handleChange}                            
                         />
 
                         {/* Effort to Buy Local Food */}
-                        <RadioGroup
+                        <RadioGroup className="outer-box"
                             name="effortToBuyLocalFood"
                             legend="Do you make an effort to buy local food?"
                             options={options.effortToBuyLocalFoodOptions}
@@ -441,12 +467,20 @@ export default function Home() {
                         />
 
                         {/* Willing to Give Up */}
+                        <OpenQuestion className="outer-box"
+                            name="willingToGiveUp" 
+                            question="What are you willing to give up to reduce your carbon footprint?" 
+                            size="small" 
+                            type="text"
+                            value={formData.willingToGiveUp}
+                            onChange={handleChange}                            
+                        />
+
                         <legend> What are you willing to give up to reduce your carbon footprint?</legend>
                         <input
                             className="input-base"
                             name="willingToGiveUp"
                             type="text"
-                            value={formData.willingToGiveUp}
                             onChange={handleChange}
                         />
 
@@ -456,20 +490,20 @@ export default function Home() {
                             className="input-base"
                             name="notWillingToGiveUp"
                             type="text"
-                            value={formData.notWillingToGiveUp}
+                            //value={formData.notWillingToGiveUp}
                             onChange={handleChange}
                         />
 
                         {/* Willing to Engage With */}
                         <legend> Would you be willing to engage with friends, family, or coworkers to reduce your climate impact?</legend>
                         {options.willingToEngageOptions.map((option) => (
-                            <label key={option.value}>
+                            <label key={"willingToEngageWith-" + option.value}>
                                 <input
                                     type="checkbox"
                                     name="willingToEngageWith"
                                     value={option.value}
                                     disabled={(isNotOpenSelected && option.value !== "notOpen") || (isAnyOtherEngageSelected && option.value === "notOpen")}
-                                    checked={formData.willingToEngageWith.includes(option.value)}
+                                    checked={formData.willingToEngageWith?.includes(option.value)}
                                     onChange={(e) => handleEngageCheckboxChange(e)}
                                 />
                                 {option.label}
@@ -486,7 +520,7 @@ export default function Home() {
                         <textarea
                             className="large-text-box"
                             name="groupGoals"
-                            value={formData.groupGoals}
+                            //value={formData.groupGoals}
                             onChange={handleChange}
                         />
 

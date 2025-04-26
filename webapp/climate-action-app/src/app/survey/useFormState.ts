@@ -1,30 +1,8 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 
 export function useFormState() {
     // State to manage user's input into form
-    const [formData, setFormData] = useState<FormDataEntry>({
-        referredBy: "", // 
-        otherReferralValue: "",
-        inclinationToChange: "",
-        largestImpactChoice: "",
-        totalCarbonFootprint: 0,
-        airTravelFootprint: 0,
-        homeFootprint: 0,
-        groundTransportationFootprint: 0,
-        dietFootprint: 0,
-        electricityFootprint: 0,
-        otherConsumptionFootprint: 0,
-        airTravelLeisurePercentage: 0,
-        goalToReduceAirTravel: "",
-        drivesCar: true,
-        replaceableDrivingByTransitPercentage: 0,
-        ideasToImproveDiet: "",
-        effortToBuyLocalFood: "",
-        willingToGiveUp: "",
-        notWillingToGiveUp: "",
-        willingToEngageWith: [] as string[],
-        groupGoals: "",
-    });
+    const [formData, setFormData] = useState<{ [key: string]: any }>({});
 
     // State to manage error messages for each carbon footprint input field (i.e., non numerical input)
     const [errorMessages, setErrorMessages] = useState<{ [key: string]: string }>({
@@ -38,7 +16,7 @@ export function useFormState() {
     });
 
     // Handle form input changes
-    const handleChange = (e: React.ChangeEvent<any>) => {
+    const handleChange = useCallback((e: React.ChangeEvent<any>) => {
 
         const { name, value, type } = e.target;
 
@@ -87,7 +65,7 @@ export function useFormState() {
                 [name]: type === "number" ? Number(value) : value,
                 airTravelLeisurePercentage: 0,
             }));
-    };
+    }, []);
 
     return {
         formData,
@@ -95,37 +73,4 @@ export function useFormState() {
         errorMessages,
         handleChange,
     };
-}
-
-interface FormDataEntry {
-
-    referredBy: string;             // Can be "family", "friends", "supervisorOrCoworker", or "Other"
-    otherReferralValue: string;     // If referredBy==="Other", this is the value
-    inclinationToChange: string;    // Example: "notInclined", "slightlyInclined", etc.
-    largestImpactChoice: string;    // Example: "home", "electricity", etc.
-    effortToBuyLocalFood: string;   // Example: "yes", "no", "occasionally"
-    willingToEngageWith: string[];  // Multi-select checkbox values. Example: ["friends", "family", "coworkers", "otherCommunities", "notOpen"]
-
-    /* Carbon footprint results from external calculator */
-    totalCarbonFootprint: number; // Total combined footprint
-    airTravelFootprint: number;
-    homeFootprint: number;
-    groundTransportationFootprint: number;
-    dietFootprint: number;
-    electricityFootprint: number;
-    otherConsumptionFootprint: number;
-
-    airTravelLeisurePercentage: number; // Slider value, % of air travel that is for leisure (0%-100%)
-
-    replaceableDrivingByTransitPercentage: number;  // Slider value, % of driving that can be replaced by public transit (0%-100%)
-
-    /* NOTE: Does not change the value of replaceableDrivingByTransitPercentage, just disables the slider. */
-    drivesCar: boolean; // If false, disables replaceableDrivingByTransitPercentage slider.
-
-    /* Open-ended responses */
-    goalToReduceAirTravel: string;
-    ideasToImproveDiet: string;
-    willingToGiveUp: string;
-    notWillingToGiveUp: string; // Example: "meat", "flying", etc.
-    groupGoals: string; // Free text input
 }

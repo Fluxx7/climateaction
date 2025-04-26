@@ -141,6 +141,9 @@ fieldset .inline-label {
 
 .outer-box {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   background: var(--foreground);
   color: var(--text);
+  @apply px-6 py-2 rounded-lg transition-colors duration-200 text-center border-2
 }

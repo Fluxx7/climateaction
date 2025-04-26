@@ -2,7 +2,7 @@
 export const referralOptions = [
     { value: "family", label: "Family" },
     { value: "friends", label: "Friends" },
-    { value: "supervisorOrCoworker", label: "Supervisor/Coworkers" },
+    { value: "supervisorOrCoworker", label: "Supervisor/Coworkers" }
 ];
 
 export const inclinationOptions = [
