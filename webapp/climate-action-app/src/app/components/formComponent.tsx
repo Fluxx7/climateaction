@@ -4,18 +4,15 @@ import { EventSubmission, useFormState } from "../survey/useFormState";
 import { RadioGroup, OpenQuestion, SliderQuestion, CheckboxGroup } from "./minorComponents";
 
 
-export default function SurveyForm(userConsent: boolean) {
+const SurveyForm = ({
+    consent: userConsent
+}: {consent: boolean}) => {
     const { formData, setFormData, errorMessages, handleChange } = useFormState();
     const otherRef = useRef(""); // State to manage user signature
     
     const [drivesCar, setDrivesCar] = useState(true); // Used for enabling the slider for replaceableDrivingByTransitPercentage
     const [pageNum, setPageNum] = useState(0);
     const [submitted, setSubmitted] = useState(false); // State to manage form submission
-
-
-
-   
-
 
 
     // Handle form submission
@@ -292,3 +289,5 @@ export default function SurveyForm(userConsent: boolean) {
             <p>Your responses have been recorded.</p>
         </div>);
 };
+
+export default SurveyForm;

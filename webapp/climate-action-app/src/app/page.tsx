@@ -5,9 +5,10 @@ import * as options from "./survey/options";
 import { useFormState } from './survey/useFormState';
 import { useEffect, useState } from "react";
 import SurveyForm from "./components/formComponent";
+import ConsentPage from "./components/consentComponent";
 
 export default function Home() {
-    const [userConsent, setUserConsent] = useState(true); // State to manage user consent
+    const [userConsent, setUserConsent] = useState(false); // State to manage user consent
     
     useEffect(() => {
         // Trigger the database initialization when the page is loaded (only initializes if it has not been initialized yet)
@@ -49,12 +50,11 @@ export default function Home() {
                 <header className="logo-container mb-8">
                     <img src="/wpilogo.png" alt="Logo" className="logo" />
                 </header>
-                {!userConsent ? 
-                (
-                    <></>
-                ) 
-                :
-                <SurveyForm/>}
+                {
+                !userConsent ? 
+                    <ConsentPage contButtonCallback={continueToSurvey}/> :
+                    <SurveyForm consent={userConsent}/>
+                }
                  
             </main>
         </div>

@@ -69,19 +69,21 @@ export const OpenQuestion = ({
 }: InputQuestionProps) => {
     return (
         <div className={className + " outer-box"}>
-            <legend className="carbon-footprint-question font-bold">{question}</legend>
+            <legend className="carbon-footprint-question">{question}</legend>
             <p className="text-red-500 text-sm">
                 {errorMessage || "\u00A0"} { /* No-break-space character to maintain paragraph height for consistent formatting */}
             </p>
             {size === "large" ?
                 (<textarea
                     className={`large-text-box input-base ${errorMessage ? "input-error" : "input-normal"}`}
+                    style={{color: 'var(--text)',borderColor: 'white',background: 'var(--background)'}}
                     name={name}
                     value={value ?? ""}
                     onChange={onChange}
                 />)
                 : (<input
                     className={`input-base ${errorMessage ? 'input-error' : 'input-normal'}`}
+                    style={{color: 'var(--text)',borderColor: 'white',background: 'var(--background)'}}
                     name={name}
                     type={type}
                     value={value ?? ""}
@@ -105,11 +107,11 @@ export const RadioGroup = (props: RadioGroupProps) => {
             props.onChange(value);
         }
     }, [selected, value]);
-    
+
     return (
         <fieldset className={props.className + " outer-box"}>
             <p>
-                <legend className="font-bold">{props.question}</legend>
+                <legend className="carbon-footprint-question">{props.question}</legend>
             </p>
             {props.options.map((option) => (
                 <label key={props.name + "-" + option.value}> {/* Label for each option from options */}
@@ -151,7 +153,7 @@ export const SliderQuestion = (props: SliderQuestionProps) => {
     return (
         <div className={props.className + " outer-box"}>
             <div className={`range-input ${!disabled ? '' : 'disabled-range-input'} flex flex-col items-start text-left`}>
-                <legend className="text-left w-full">{props.question}</legend>
+                <legend className="carbon-footprint-question">{props.question}</legend>
                 <input
                     type="range"
                     name={props.name}
@@ -233,7 +235,7 @@ export const CheckboxGroup = (props: CheckboxGroupProps) => {
 
     return (
         <div className={props.className + " outer-box"}>
-            <legend> {props.question}</legend>
+            <legend className="carbon-footprint-question"> {props.question}</legend>
             {props.options.map((option) => (
                 <label key={props.name + "-" + option.value}>
                     <input

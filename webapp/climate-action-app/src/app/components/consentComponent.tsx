@@ -4,7 +4,7 @@ import { sign } from "crypto";
 import React, { useEffect } from "react";
 import { useState } from "react";
 
-export default function ConsentPage(contButtonCallback: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, signature: string) => void) {
+export default function ConsentPage({contButtonCallback} : {contButtonCallback: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>, signature: string) => void}) {
     const [consentText, setConsentText] = useState<string[]>([]); // State to store the consent paragraph and final line
     const [signature, setSignature] = useState(""); // State to manage user signature
 

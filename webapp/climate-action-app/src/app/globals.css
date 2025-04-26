@@ -102,6 +102,7 @@ input[type="text"] {
 .carbon-footprint-question {
   display: block;
   margin-bottom: 0px;
+  @apply text-left font-bold w-full
 }
 
 input[type="checkbox"],
