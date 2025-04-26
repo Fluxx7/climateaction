@@ -1,7 +1,7 @@
 "use client";
 
 // import Image from "next/image";
-import { useState, useRef, FormEvent } from "react";
+import { useState} from "react";
 import calculate from "./calculator";
 
 export default function Home() {

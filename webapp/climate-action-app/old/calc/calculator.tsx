@@ -26,11 +26,11 @@ export default function calculate(inputEmissionsTagArray: [number, string][]) {
     Each output is stored in an array of [string, number] tuples where the string is the tag, and the number is the emissions for that tag
     The total emissions are also summed and put into the last position in the array
     */
-    let result: [key: string, value: number][] = inputEmissionsTagArray.map((element) => {
+    const result: [key: string, value: number][] = inputEmissionsTagArray.map((element) => {
         if (!(element[1] in emissionsFunctions)) {
             throw new Error("Undefined operation '" + element[1] + "' attempted");
         }
-        let output = emissionsFunctions[element[1]](element[0]);
+        const output = emissionsFunctions[element[1]](element[0]);
         total += output;
         return [element[1], output]
     });
