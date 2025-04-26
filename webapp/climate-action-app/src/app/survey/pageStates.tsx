@@ -24,7 +24,7 @@ export interface InputQuestionProps {
     question: string; // Question
     size: string;
     type?: string;
-    value?: string; // Currently selected value (passed in from formData)
+    value: string; // Currently selected value (passed in from formData)
     className?: string; //classes for div
     errorMessage?: string;
     step?: number | string;
