@@ -1,23 +1,13 @@
-import mysql from 'mysql2/promise';
-import fs from 'fs';
-import path from 'path';
+import { createClient } from '@supabase/supabase-js'
 
-export async function initializeDatabase() {
-    const connection = await mysql.createConnection({
-        host: process.env.DB_HOST || 'localhost',
-        user: process.env.DB_USER || 'root',
-        password: process.env.DB_PASSWORD || '',
-        multipleStatements: true,
-    });
+const supabaseUrl = 'https://mqewhofkgjaphfnvafsb.supabase.co';
+// Use SUPABASE_SERVICE_ROLE_KEY for server-side operations
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xZXdob2ZrZ2phcGhmbnZhZnNiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU2Nzg2NDMsImV4cCI6MjA2MTI1NDY0M30.z9pwfgwTRyXuVgadnGvuFWbEUrKQDP8bT9A-DCR2bS4";//process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-    const sql = fs.readFileSync(path.join(process.cwd(), 'src', 'app', 'db', 'init.sql'), 'utf-8');
-
-    try {
-        await connection.query(sql);
-        console.log('Database initialized successfully');
-    } catch (error) {
-        console.error('Error initializing database:', error);
-    } finally {
-        await connection.end();
-    }
+if (!supabaseKey) {
+  throw new Error('Supabase key is missing. Check your environment variables.');
 }
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+export default supabase;

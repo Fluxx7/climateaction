@@ -1,8 +1,5 @@
-import { initializeDatabase } from "@/app/db/dbInit";
-
 export async function GET() {
   try {
-    await initializeDatabase();
     return new Response('Database initialized successfully', {
       status: 200,
     });
