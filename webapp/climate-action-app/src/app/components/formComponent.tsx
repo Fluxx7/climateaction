@@ -18,6 +18,8 @@ const SurveyForm = ({
 
     const referrerTag = searchParams?.get('rftg') ?? "0";
 
+    
+
 
     // Handle form submission
     const handleSubmit = async (e: React.FormEvent) => {
@@ -346,7 +348,7 @@ const SecondPage = ({ callback, update, data, errorMessages }: { callback: (e: R
             errorMessage={errorMessages.otherConsumptionFootprint}
             onChange={update} />
         <div>
-        <button type="button" className="calc-btn" onClick={callback}>{"Next" }</button>
+        <button type="button" className="calc-btn"  onClick={callback}>{"Next" }</button>
         {/* <button type="button" className={`${completed ? "calc-btn" : "px-4 py-2 bg-gray-600 text-white rounded"}`} onClick={callback} disabled={!completed}>{completed ? "Next" : "Fill out all Fields"}</button> */}
         </div>
     </>)

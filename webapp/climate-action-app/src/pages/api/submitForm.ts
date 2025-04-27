@@ -20,6 +20,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 throw userError;
             }
 
+            async function generateUniqueTag() {
+                let unique = false;
+                let newTag = 0;
+              
+                for (let i = 0; !unique && i < 1000; i++) {
+                  newTag = Math.floor(Math.random() * 10000000); // random number between 0 and 9,999,999
+              
+                  const { data, error } = await supabase
+                    .from('referrals')
+                    .select('refTag')
+                    .eq('refTag', newTag)
+                    .maybeSingle();
+              
+                  if (!data) {
+                    unique = true;
+                  }
+                }
+              
+                return newTag;
+              }
+
             const userId = userData.user_id;
             const refTag: string = body.referrerTag;
 
@@ -37,11 +58,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             const submissionId = submissionData.id;
 
-            const maxTagValue = 100000;
-            const userTag = Math.floor(Math.random() * maxTagValue) + 1;
+            const userTag: number = await generateUniqueTag();
             const referral = Object.entries(body.data)
                 .filter(([key]) => key === 'referredBy')
-                .map(([value]) => ({
+                .map(([key, value]) => ({
                     referrer_tag: Number(refTag),
                     relationship: value,
                     user_tag: userTag
