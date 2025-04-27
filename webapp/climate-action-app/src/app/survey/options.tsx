@@ -6,7 +6,8 @@ export const referralOptions: RadioOption[] = [
     { value: "family", label: "Family" },
     { value: "friends", label: "Friends" },
     { value: "supervisorOrCoworker", label: "Supervisor/Coworkers" },
-    { value: "other", label: "Other: ", textValue: true}
+    { value: "other", label: "Other: ", textValue: true},
+    { value: "prefNot", label: "Prefer not to say"}
 ];
 
 export const inclinationOptions: RadioOption[] = [

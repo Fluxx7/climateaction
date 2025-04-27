@@ -3,6 +3,7 @@
 :root {
   --background: #3b9191;
   --foreground: #45aa77;
+  --highlights: #47739d;
   --button-primary: var(--color-blue-500);
   --button-primary-hv: var(--color-blue-600);
 }
@@ -20,6 +21,7 @@
   :root {
     --background: #116d6d;
     --foreground: #046534;
+    --highlights: #1A4976;
     --text: #ffffff;
     --button-primary: var(--color-blue-800);
     --button-primary-hv: var(--color-blue-700);
@@ -35,6 +37,7 @@ body {
 .calc-btn {
   @apply px-4 py-2 bg-button-primary text-white rounded hover:bg-button-primary-hover;
 }
+
 
 legend {
   font-size: 1.2em;
@@ -60,7 +63,7 @@ input[type="text"] {
 .range-input {
   width: calc(100% - 4rem);
   display: flex;
-  align-items: center;
+  align-items: left;
 }
 
 .disabled-range-input {
@@ -72,6 +75,8 @@ input[type="text"] {
   -webkit-appearance: none;
   appearance: none;
   height: 8px;
+  margin-top: 10px;
+  margin-bottom: 5px;
   background: #ddd;
   border-radius: 5px;
   width: 100%;
@@ -101,6 +106,7 @@ input[type="text"] {
 
 .carbon-footprint-question {
   display: block;
+  margin-top: 0px;
   margin-bottom: 0px;
   @apply text-left font-bold w-full
 }
@@ -145,6 +151,20 @@ fieldset .inline-label {
   flex-direction: column;
   align-items: flex-start;
   background: var(--foreground);
+  margin-top: 10px;
+  color: var(--text);
+  @apply px-6 py-2 rounded-lg transition-colors duration-200 text-center border-2
+}
+
+.inner-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  background: var(--highlights);
+  width: 700px;
+  margin-bottom: 10px;
+  margin-top: 10px;
   color: var(--text);
   @apply px-6 py-2 rounded-lg transition-colors duration-200 text-center border-2
 }

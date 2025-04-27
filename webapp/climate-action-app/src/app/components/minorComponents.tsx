@@ -69,7 +69,7 @@ export const OpenQuestion = ({
 }: InputQuestionProps) => {
     return (
         <div className={className + " outer-box"}>
-            <legend className="carbon-footprint-question">{question}</legend>
+            <legend className="carbon-footprint-question inner-box">{question}</legend>
             <p className="text-red-500 text-sm">
                 {errorMessage || "\u00A0"} { /* No-break-space character to maintain paragraph height for consistent formatting */}
             </p>
@@ -115,9 +115,9 @@ export const RadioGroup = ({
     }, [selected, target, onChange]);
 
     return (
-        <fieldset className={className + " outer-box"}>
+        <fieldset className={className + " outer-box "}>
             <p>
-                <legend className="carbon-footprint-question">{question}</legend>
+                <legend className="carbon-footprint-question inner-box">{question}</legend>
             </p>
             {options.map((option) => (
                 <label key={name + "-" + option.value}> {/* Label for each option from options */}
@@ -159,7 +159,7 @@ export const SliderQuestion = (props: SliderQuestionProps) => {
     return (
         <div className={props.className + " outer-box"}>
             <div className={`range-input ${!disabled ? '' : 'disabled-range-input'} flex flex-col items-start text-left`}>
-                <legend className="carbon-footprint-question">{props.question}</legend>
+                <legend className="carbon-footprint-question inner-box flex">{props.question}</legend>
                 <input
                     type="range"
                     name={props.name}
@@ -241,7 +241,7 @@ export const CheckboxGroup = ({name, onChange, options, className, question, }: 
 
     return (
         <div className={className + " outer-box"}>
-            <legend className="carbon-footprint-question"> {question}</legend>
+            <legend className="carbon-footprint-question inner-box"> {question}</legend>
             {options.map((option) => (
                 <label key={name + "-" + option.value}>
                     <input
