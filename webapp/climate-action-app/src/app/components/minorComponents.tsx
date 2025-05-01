@@ -180,7 +180,7 @@ export const SliderQuestion = (props: SliderQuestionProps) => {
                         checked={disabled}
                         onChange={(e) => {
                             setDisabled(e.target.checked);
-                            props.onChange(e);
+                            props.onChange({target: {name: props.name, value: 0, type: props.type}});
                         }} />
                     {props.disable}
                 </label>}
