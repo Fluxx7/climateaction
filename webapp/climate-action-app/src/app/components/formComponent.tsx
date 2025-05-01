@@ -18,10 +18,10 @@ const SurveyForm = ({
 
     const referrerTag = searchParams?.get('rftg') ?? "0";
 
-    let bestAirTravelFootprint = 0;
-    let bestGroundTransportationFootprint = 0;
-    let bestDietFootprint = 0;
-    let bestTotalCarbonFootprint = 0;
+    const [bestAirTravelFootprint, setBestAirTravelFootprint] = useState(0);
+    const [bestGroundTransportationFootprint, setBestGroundTransportationFootprint] = useState(0);
+    const [bestDietFootprint, setBestDietFootprint] = useState(0);
+    const [bestTotalCarbonFootprint, setBestTotalCarbonFootprint] = useState(0);
 
 
     // Handle form submission
@@ -51,13 +51,17 @@ const SurveyForm = ({
             console.log('Form submitted successfully');
 
             // Calculate theoretical best values
-            bestTotalCarbonFootprint = submissionData.totalCarbonFootprint - submissionData.airTravelFootprint - submissionData.groundTransportationFootprint - submissionData.dietFootprint;
-            
-            bestAirTravelFootprint = submissionData.airTravelFootprint * (1 - submissionData.airTravelLeisurePercentage);
-            bestGroundTransportationFootprint = submissionData.groundTransportationFootprint * (1 - submissionData.replaceableDrivingByTransitPercentage);
-            bestDietFootprint = submissionData.effortToBuyLocalFood == "yes" ? submissionData.dietFootprint * .94 : submissionData.dietFootprint;
-
+            let bestTotalCarbonFootprint = submissionData.totalCarbonFootprint - submissionData.airTravelFootprint - submissionData.groundTransportationFootprint - submissionData.dietFootprint;
+            const bestAirTravelFootprint = submissionData.airTravelFootprint * (1 - submissionData.airTravelLeisurePercentage/100);
+            const bestGroundTransportationFootprint = submissionData.groundTransportationFootprint * (1 - submissionData.replaceableDrivingByTransitPercentage/100);
+            const bestDietFootprint = submissionData.effortToBuyLocalFood == "yes" ? submissionData.dietFootprint * .94 : submissionData.dietFootprint;
             bestTotalCarbonFootprint += bestAirTravelFootprint + bestGroundTransportationFootprint + bestDietFootprint;
+
+            // Set best values in state
+            setBestAirTravelFootprint(bestAirTravelFootprint);
+            setBestGroundTransportationFootprint(bestGroundTransportationFootprint);
+            setBestDietFootprint(bestDietFootprint);
+            setBestTotalCarbonFootprint(bestTotalCarbonFootprint);
             setSubmitted(true); // Set submitted to true to indicate form submission
             const data = await response.json();
             setUserTag(data.tag);
