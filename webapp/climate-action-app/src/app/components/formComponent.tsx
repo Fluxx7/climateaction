@@ -18,7 +18,10 @@ const SurveyForm = ({
 
     const referrerTag = searchParams?.get('rftg') ?? "0";
 
-    
+    let bestAirTravelFootprint;
+    let bestGroundTransportationFootprint;
+    let bestDietFootprint;
+    let bestTotalCarbonFootprint;
 
 
     // Handle form submission
@@ -46,6 +49,9 @@ const SurveyForm = ({
 
         if (response.ok) {
             console.log('Form submitted successfully');
+            
+            // Calculate theoretical best values
+            formData.airTravelFootprint * (1 - formData.airTravelLeisurePercentage)
             setSubmitted(true); // Set submitted to true to indicate form submission
             const data = await response.json();
             setUserTag(data.tag);
@@ -187,9 +193,18 @@ const SurveyForm = ({
                     </>)}
         </form>) : (
         <div className="text-center flex flex-col items-center">
-            <h2 className="text-2xl font-bold mb-4" style={{marginBottom:"5px"}}>Thank you for your submission!</h2>
+            <h2 className="text-2xl font-bold mb-4" style={{ marginBottom: "5px" }}>Thank you for your submission!</h2>
             <p>Your responses have been recorded.</p>
-            <p style={{marginBottom:"10px"}}>Want to share this survey? Use this link:</p>
+            <p> Theoretical Best Air Travel Footprint: {}</p>
+            <p> Theoretical Best Ground Transit Footprint: {formData.groundTransportationFootprint * (1 - formData.replaceableDrivingByTransitPercentage)}</p>
+            <p> Theoretical Best Diet Footprint: {formData.effortToBuyLocalFood == "yes" ? formData.dietFootprint * .94 : formData.dietFootprint}</p>
+            <p> Theoretical Best Total Carbon Footprint:
+                {
+
+                }
+            </p>
+            <p> Theoretical Best Air Travel Footprint: </p>
+            <p style={{ marginBottom: "10px" }}>Want to share this survey? Use this link:</p>
             <div className="flex items-center justify-center align-middle space-x-2"> {/* Updated flex settings */}
                 <input
                     className="outer-box justify-center font-bold"
@@ -214,18 +229,18 @@ const SurveyForm = ({
 // data is the current form values
 const FirstPage = ({ callback, update, data }: { callback: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void, update: (e: React.ChangeEvent<any> | EventSubmission) => void, data: { [key: string]: any } }) => {
     const [completed, setCompleted] = useState(false);
-    
+
     useEffect(() => {
         if (data.referredBy !== '' && data.referredBy &&
-            data.inclinationToChange !== '' && data.inclinationToChange 
-            && 
-            data.largestImpactChoice !== '' && data.largestImpactChoice ) {
-                setCompleted(true);
-        } else if (completed ){
+            data.inclinationToChange !== '' && data.inclinationToChange
+            &&
+            data.largestImpactChoice !== '' && data.largestImpactChoice) {
+            setCompleted(true);
+        } else if (completed) {
             setCompleted(false);
         }
     }, [data.referredBy, data.inclinationToChange, data.largestImpactChoice]);
-    
+
     return (<>
         {/* Referred By */}
         <RadioGroup
@@ -265,7 +280,7 @@ const FirstPage = ({ callback, update, data }: { callback: (e: React.MouseEvent<
 // update is the function for updating the form values
 // data is the current form values
 const SecondPage = ({ callback, update, data, errorMessages }: { callback: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void, update: (e: React.ChangeEvent<any> | EventSubmission) => void, data: { [key: string]: any }, errorMessages: { [key: string]: any } }) => {
-    
+
     return (<>
         <p className="outer-box">Go to this site and fill out the questions, then enter your results into the text boxes below:
             <Link className="font-bold inner-box box-content w-[270px]! text-blue-700!" href={"https://uba.co2-rechner.de/de_DE/quickcheck/"} rel="noopener noreferrer" target="_blank">Umwelt Bundesamt CO2 Rechner</Link>
@@ -348,8 +363,8 @@ const SecondPage = ({ callback, update, data, errorMessages }: { callback: (e: R
             errorMessage={errorMessages.otherConsumptionFootprint}
             onChange={update} />
         <div>
-        <button type="button" className="calc-btn"  onClick={callback}>{"Next" }</button>
-        {/* <button type="button" className={`${completed ? "calc-btn" : "px-4 py-2 bg-gray-600 text-white rounded"}`} onClick={callback} disabled={!completed}>{completed ? "Next" : "Fill out all Fields"}</button> */}
+            <button type="button" className="calc-btn" onClick={callback}>{"Next"}</button>
+            {/* <button type="button" className={`${completed ? "calc-btn" : "px-4 py-2 bg-gray-600 text-white rounded"}`} onClick={callback} disabled={!completed}>{completed ? "Next" : "Fill out all Fields"}</button> */}
         </div>
     </>)
 
