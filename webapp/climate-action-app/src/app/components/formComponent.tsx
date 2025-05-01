@@ -205,11 +205,39 @@ const SurveyForm = ({
         <div className="text-center flex flex-col items-center">
             <h2 className="text-2xl font-bold mb-4" style={{ marginBottom: "5px" }}>Thank you for your submission!</h2>
             <p>Your responses have been recorded.</p>
-            <p> Theoretical Best Air Travel Footprint: {bestAirTravelFootprint}</p>
-            <p> Theoretical Best Ground Transit Footprint: {bestGroundTransportationFootprint}</p>
-            <p> Theoretical Best Diet Footprint: {bestDietFootprint}</p>
-            <p> Theoretical Best Total Carbon Footprint: {bestTotalCarbonFootprint}</p>
-            <p> Theoretical Reduction: {formData.totalCarbonFootprint - bestTotalCarbonFootprint}</p>
+            <div className="outer-box grid! grid-cols-3 grid-rows-7 col-span-1">
+                <p className="row-start-1 row-span-1 col-start-1 col-span-3 font-bold"> Carbon Footprint Results </p>
+                {/* Grid Column 1 */}
+                <div className="col-start-1 row-start-2 row-span-5" >
+                    <p className="font-bold"> Footprint Categories</p>
+                    <p> Air Travel:</p>
+                    <p> Ground Transit:</p>
+                    <p> Diet:</p>
+                    <p> Total Footprint:</p>
+                </div>
+
+                {/* Grid Column 3 */}
+                <div className="col-start-2 row-start-2 row-span-5" >
+                    <p className="font-bold"> Current:</p>
+                    <p> {formData.airTravelFootprint} tons</p>
+                    <p> {formData.groundTransportationFootprint} tons</p>
+                    <p> {formData.dietFootprint} tons</p>
+                    <p> {formData.totalCarbonFootprint} tons</p>
+                </div>
+
+                {/* Grid Column 3 */}
+                <div className="col-start-3 row-start-2 row-span-5" >
+                    <p className="font-bold"> Theoretical Best:</p>
+                    <p> {bestAirTravelFootprint} tons</p>
+                    <p> {bestGroundTransportationFootprint} tons</p>
+                    <p> {bestDietFootprint} tons</p>
+                    <p> {bestTotalCarbonFootprint} tons</p>
+                </div>
+
+                <div className="col-start-1 col-span-3 row-start-7 row-span-1">
+                    <p className="font-bold"> Theoretical Reduction: {formData.totalCarbonFootprint - bestTotalCarbonFootprint} tons</p>
+                </div>
+            </div>
             <p style={{ marginBottom: "10px" }}>Want to share this survey? Use this link:</p>
             <div className="flex items-center justify-center align-middle space-x-2"> {/* Updated flex settings */}
                 <input
