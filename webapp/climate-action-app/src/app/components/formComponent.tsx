@@ -18,10 +18,10 @@ const SurveyForm = ({
 
     const referrerTag = searchParams?.get('rftg') ?? "0";
 
-    let bestAirTravelFootprint;
-    let bestGroundTransportationFootprint;
-    let bestDietFootprint;
-    let bestTotalCarbonFootprint;
+    let bestAirTravelFootprint = 0;
+    let bestGroundTransportationFootprint = 0;
+    let bestDietFootprint = 0;
+    let bestTotalCarbonFootprint = 0;
 
 
     // Handle form submission
@@ -49,9 +49,15 @@ const SurveyForm = ({
 
         if (response.ok) {
             console.log('Form submitted successfully');
-            
+
             // Calculate theoretical best values
-            formData.airTravelFootprint * (1 - formData.airTravelLeisurePercentage)
+            bestTotalCarbonFootprint = submissionData.totalCarbonFootprint - submissionData.airTravelFootprint - submissionData.groundTransportationFootprint - submissionData.dietFootprint;
+            
+            bestAirTravelFootprint = submissionData.airTravelFootprint * (1 - submissionData.airTravelLeisurePercentage);
+            bestGroundTransportationFootprint = submissionData.groundTransportationFootprint * (1 - submissionData.replaceableDrivingByTransitPercentage);
+            bestDietFootprint = submissionData.effortToBuyLocalFood == "yes" ? submissionData.dietFootprint * .94 : submissionData.dietFootprint;
+
+            bestTotalCarbonFootprint += bestAirTravelFootprint + bestGroundTransportationFootprint + bestDietFootprint;
             setSubmitted(true); // Set submitted to true to indicate form submission
             const data = await response.json();
             setUserTag(data.tag);
@@ -195,15 +201,11 @@ const SurveyForm = ({
         <div className="text-center flex flex-col items-center">
             <h2 className="text-2xl font-bold mb-4" style={{ marginBottom: "5px" }}>Thank you for your submission!</h2>
             <p>Your responses have been recorded.</p>
-            <p> Theoretical Best Air Travel Footprint: {}</p>
-            <p> Theoretical Best Ground Transit Footprint: {formData.groundTransportationFootprint * (1 - formData.replaceableDrivingByTransitPercentage)}</p>
-            <p> Theoretical Best Diet Footprint: {formData.effortToBuyLocalFood == "yes" ? formData.dietFootprint * .94 : formData.dietFootprint}</p>
-            <p> Theoretical Best Total Carbon Footprint:
-                {
-
-                }
-            </p>
-            <p> Theoretical Best Air Travel Footprint: </p>
+            <p> Theoretical Best Air Travel Footprint: {bestAirTravelFootprint}</p>
+            <p> Theoretical Best Ground Transit Footprint: {bestGroundTransportationFootprint}</p>
+            <p> Theoretical Best Diet Footprint: {bestDietFootprint}</p>
+            <p> Theoretical Best Total Carbon Footprint: {bestTotalCarbonFootprint}</p>
+            <p> Theoretical Reduction: {formData.totalCarbonFootprint - bestTotalCarbonFootprint}</p>
             <p style={{ marginBottom: "10px" }}>Want to share this survey? Use this link:</p>
             <div className="flex items-center justify-center align-middle space-x-2"> {/* Updated flex settings */}
                 <input
