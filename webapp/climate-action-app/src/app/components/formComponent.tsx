@@ -32,10 +32,6 @@ const SurveyForm = ({
         if (submissionData.willingToEngageWith?.length === 0)
             submissionData.willingToEngageWith = ["notOpen"];
 
-
-        if (!submissionData.drivesCar)
-            submissionData.replaceableDrivingByTransitPercentage = 0; // If user does not drive, set replaceableDrivingByTransitPercentage to 0
-
         const response = await fetch('/api/submitForm', {
             method: 'POST',
             headers: {
