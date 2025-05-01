@@ -76,14 +76,14 @@ export const OpenQuestion = ({
             {size === "large" ?
                 (<textarea
                     className={`large-text-box input-base ${errorMessage ? "input-error" : "input-normal"}`}
-                    style={{color: 'var(--text)',borderColor: 'white',background: 'var(--background)'}}
+                    style={{color: 'var(--text)',borderColor: 'gray',background: 'var(--background)'}}
                     name={name}
                     value={value ?? ""}
                     onChange={e => onChange({target: {name: e.target.name, value: e.target.value, type: e.target.type}})}
                 />)
                 : (<input
                     className={`input-base ${errorMessage ? 'input-error' : 'input-normal'}`}
-                    style={{color: 'var(--text)',borderColor: 'white',background: 'var(--background)'}}
+                    style={{color: 'var(--text)',borderColor: 'gray',background: 'var(--background)'}}
                     name={name}
                     type={type}
                     value={value ?? ""}
@@ -143,8 +143,8 @@ export const RadioGroup = ({
                         className="border rounded-md p-2"
                         style={{
                             color: selected === option.value ? 'var(--text)' : 'gray',
-                            borderColor: selected === option.value ? 'white' : 'gray',
-                            background: selected === option.value ? 'var(--background)' : '#045656'
+                            borderColor: selected === option.value ? '#8c9fb9' : 'gray',
+                            background: selected === option.value ? 'var(--highlights)' : '#84A9B1'
                         }} />}
                 </label>
             ))}

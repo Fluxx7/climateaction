@@ -128,7 +128,7 @@ const SurveyForm = ({
                         {/* Ideas to Improve Diet */}
                         <OpenQuestion
                             name="ideasToImproveDiet"
-                            question="Do you have any ideas to improve your diet for the future?"
+                            question="Do you have any ideas to improve your diet's sustainability for the future?"
                             size="large"
                             value={formData.ideasToImproveDiet}
                             onChange={handleChange} />
@@ -268,7 +268,7 @@ const SecondPage = ({ callback, update, data, errorMessages }: { callback: (e: R
     
     return (<>
         <p className="outer-box">Go to this site and fill out the questions, then enter your results into the text boxes below:
-            <Link className="font-bold inner-box box-content w-[270px]! text-cyan-300!" href={"https://uba.co2-rechner.de/de_DE/quickcheck/"} rel="noopener noreferrer" target="_blank">Umwelt Bundesamt CO2 Rechner</Link>
+            <Link className="font-bold inner-box box-content w-[270px]! text-blue-700!" href={"https://uba.co2-rechner.de/de_DE/quickcheck/"} rel="noopener noreferrer" target="_blank">Umwelt Bundesamt CO2 Rechner</Link>
         </p>
         {/* Total Carbon Footprint */}
         <OpenQuestion

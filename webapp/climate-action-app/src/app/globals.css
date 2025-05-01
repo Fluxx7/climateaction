@@ -1,9 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #3b9191;
-  --foreground: #45aa77;
-  --highlights: #47739d;
+  --background: #ffffff;
+  --foreground: #FEFBEA;
+  --highlights: #DDFFFF;
+  --text: #000000;
   --button-primary: var(--color-blue-500);
   --button-primary-hv: var(--color-blue-600);
 }
@@ -153,6 +154,7 @@ fieldset .inline-label {
   background: var(--foreground);
   margin-top: 10px;
   color: var(--text);
+  border: #ded4a7;
   @apply px-6 py-2 rounded-lg transition-colors duration-200 text-center border-2
 }
 
@@ -166,5 +168,6 @@ fieldset .inline-label {
   margin-bottom: 10px;
   margin-top: 10px;
   color: var(--text);
+  border: #95bdc8;
   @apply px-6 py-2 rounded-lg transition-colors duration-200 text-center border-2
 }
