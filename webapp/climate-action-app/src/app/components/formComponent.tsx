@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import * as options from "../survey/options";
 import { EventSubmission, useFormState } from "../survey/useFormState";
-import { RadioGroup, OpenQuestion, SliderQuestion, CheckboxGroup } from "./minorComponents";
+import { RadioGroup, OpenQuestion, SliderQuestion, CheckboxGroup, FormRendererProps } from "./minorComponents";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { FormPageComponents } from "../survey/structure";
 
 
 const SurveyForm = ({
@@ -395,5 +396,9 @@ const SecondPage = ({ callback, update, data, errorMessages }: { callback: (e: R
 
 
 }
+
+const renderPage = ({structure, onChange}: FormRendererProps<{structure: FormPageComponents[]}>) => {
+
+};
 
 export default SurveyForm;

@@ -18,21 +18,20 @@ export type CheckboxOption = {
 };
 
 // Basic fields any question component needs
-export interface BasicQuestionProps {
+export interface BasicQuestionFields {
     name: string; // key for answer in formData
     question: string; // Question
     className?: string; //classes for outer component
-    onChange: (e: React.ChangeEvent<any> | EventSubmission) => void;
 }
 
 
 // RadioGroup interface for rendering radio button groups
 // This is used for inclinationToChange, largestImpactChoice, and effortToBuyLocalFood
-interface RadioGroupProps extends BasicQuestionProps {
+export interface RadioGroupFields extends BasicQuestionFields {
     options: RadioOption[]; // Array of options for the radio buttons
 }
 
-interface InputQuestionProps extends BasicQuestionProps {
+export interface InputQuestionFields extends BasicQuestionFields {
     size: string;
     value: string;
     type?: string;
@@ -40,7 +39,7 @@ interface InputQuestionProps extends BasicQuestionProps {
     step?: number | string;
 }
 
-interface SliderQuestionProps extends BasicQuestionProps {
+export interface SliderQuestionFields extends BasicQuestionFields {
     type: string;
     value: string;
     range?: [number | string, number | string];
@@ -48,10 +47,11 @@ interface SliderQuestionProps extends BasicQuestionProps {
     disable?: string;
 }
 
-interface CheckboxGroupProps extends BasicQuestionProps {
+export interface CheckboxGroupFields extends BasicQuestionFields {
     options: CheckboxOption[]; // Array of options for the radio buttons
 }
 
+export type FormRendererProps<T> = T & {onChange: (e: React.ChangeEvent<any> | EventSubmission) => void};
 
 export const OpenQuestion = ({
     name,
@@ -63,7 +63,7 @@ export const OpenQuestion = ({
     step,
     errorMessage,
     onChange
-}: InputQuestionProps) => {
+}: FormRendererProps<InputQuestionFields>)=> {
     return (
         <div className={className + " outer-box"}>
             <legend className="carbon-footprint-question inner-box">{question}</legend>
@@ -98,9 +98,9 @@ export const RadioGroup = ({
     name,
     question,
     className,
-    onChange,
-    options
-}: RadioGroupProps) => {
+    options,
+    onChange
+}: FormRendererProps<RadioGroupFields>) => {
     const [selected, setSelected] = useState(""); // State to manage user signature
     const [target, setTarget] = useState<{name: string, value: string | number | string[], type: string}>();
 
@@ -150,7 +150,7 @@ export const RadioGroup = ({
 };
 
 // SliderQuestion component for rendering sliders
-export const SliderQuestion = (props: SliderQuestionProps) => {
+export const SliderQuestion = (props: FormRendererProps<SliderQuestionFields>) => {
     const [disabled, setDisabled] = useState<boolean>(false);
 
     return (
@@ -187,7 +187,7 @@ export const SliderQuestion = (props: SliderQuestionProps) => {
 };
 
 // CheckboxGroup component for rendering checkbox questions
-export const CheckboxGroup = ({name, onChange, options, className, question, }: CheckboxGroupProps) => {
+export const CheckboxGroup = ({name, options, className, question, onChange}: FormRendererProps<CheckboxGroupFields>) => {
     const [currGroups, setGroups] = useState<string[]>([]);
     const [selected, setSelected] = useState<[value: string, groups: string[] | undefined][]>([]);
 
