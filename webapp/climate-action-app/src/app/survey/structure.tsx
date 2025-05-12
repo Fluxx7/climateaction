@@ -11,10 +11,10 @@ export type FormPageComponents =
     ["slider", Omit<SliderQuestionFields, "value">] |
     ["text", Omit<InputQuestionFields, "value"> & { error?: boolean }] |
     // page components
-    "page-break" | 
-    ["label", string | ReactElement] |
-    ["cond-start", name: string, dependsOn: string] | 
-    ["cond-end", name: string];
+    ["page-break", {}] | 
+    ["label", {label: string | ReactElement}] |
+    ["cond-start", {name: string, dependsOn: string}] | 
+    ["cond-end", {name: string}];
 
 const structure: FormPageComponents[] = [
     // Referred by
@@ -63,13 +63,15 @@ const structure: FormPageComponents[] = [
         }
     ],
 
-    "page-break",
+    ["page-break", {}],
 
     // Link to Uba CO2 calc
     ["label",
+        {label: 
         <p className="outer-box">Go to this site and fill out the questions, then enter your results into the text boxes below:
             <Link className="font-bold inner-box box-content w-[270px]! text-blue-700!" href={"https://uba.co2-rechner.de/de_DE/quickcheck/"} rel="noopener noreferrer" target="_blank">Umwelt Bundesamt CO2 Rechner</Link>
         </p>
+        }
     ],
 
     // Total Carbon Footprint
@@ -152,10 +154,10 @@ const structure: FormPageComponents[] = [
         }
     ],
 
-    "page-break",
+    ["page-break", {}],
 
     // next two questions only appear if airTravelFootprint is above 0
-    ["cond-start", "airTravelCond", "airTravelFootprint"],
+    ["cond-start", {name: "airTravelCond", dependsOn: "airTravelFootprint"}],
 
     // Air Travel Leisure Percentage
     ["slider",
@@ -178,7 +180,7 @@ const structure: FormPageComponents[] = [
         }
     ],
 
-    ["cond-end", "airTravelCond"],
+    ["cond-end", {name: "airTravelCond"}],
 
     // Replaceable Driving by Transit Percentage
     ["slider",

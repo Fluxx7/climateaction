@@ -4,7 +4,7 @@ import { EventSubmission, useFormState } from "../survey/useFormState";
 import { RadioGroup, OpenQuestion, SliderQuestion, CheckboxGroup, FormRendererProps } from "./minorComponents";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { FormPageComponents } from "../survey/structure";
+import structure, { FormPageComponents } from "../survey/structure";
 
 
 const SurveyForm = ({
@@ -33,7 +33,7 @@ const SurveyForm = ({
 
 
         // Converts empty willingToEngageWith selection to "notOpen"
-        if (submissionData.willingToEngageWith?.length === 0)
+        if (!(submissionData.willingToEngageWith?.length !== 0))
             submissionData.willingToEngageWith = ["notOpen"];
 
         const response = await fetch('/api/submitForm', {
@@ -49,8 +49,8 @@ const SurveyForm = ({
 
             // Calculate theoretical best values
             let bestTotalCarbonFootprint = submissionData.totalCarbonFootprint - submissionData.airTravelFootprint - submissionData.groundTransportationFootprint - submissionData.dietFootprint;
-            const bestAirTravelFootprint = submissionData.airTravelFootprint * (1 - submissionData.airTravelLeisurePercentage/100);
-            const bestGroundTransportationFootprint = submissionData.groundTransportationFootprint * (1 - submissionData.replaceableDrivingByTransitPercentage/100);
+            const bestAirTravelFootprint = submissionData.airTravelFootprint * (1 - submissionData.airTravelLeisurePercentage / 100);
+            const bestGroundTransportationFootprint = submissionData.groundTransportationFootprint * (1 - submissionData.replaceableDrivingByTransitPercentage / 100);
             const bestDietFootprint = submissionData.effortToBuyLocalFood == "yes" ? submissionData.dietFootprint * .94 : submissionData.dietFootprint;
             bestTotalCarbonFootprint += bestAirTravelFootprint + bestGroundTransportationFootprint + bestDietFootprint;
 
@@ -95,7 +95,64 @@ const SurveyForm = ({
         setPageNum(pageNum + 1);
     };
 
-    return !submitted ? (
+    return  !submitted ? (<form onSubmit={handleSubmit}>
+            <RenderPage structure={structure} errorMessages={errorMessages} data={formData} onChange={handleChange} />
+            </form>) : (
+        <div className="text-center flex flex-col items-center">
+            <h2 className="text-2xl font-bold mb-4" style={{ marginBottom: "5px" }}>Thank you for your submission!</h2>
+            <p>Your responses have been recorded.</p>
+            <div className="outer-box grid! grid-cols-3 grid-rows-7 col-span-1">
+                <p className="row-start-1 row-span-1 col-start-1 col-span-3 font-bold"> Carbon Footprint Results </p>
+                {/* Grid Column 1 */}
+                <div className="col-start-1 row-start-2 row-span-5" >
+                    <p className="font-bold"> Footprint Categories</p>
+                    <p> Air Travel:</p>
+                    <p> Ground Transit:</p>
+                    <p> Diet:</p>
+                    <p> Total Footprint:</p>
+                </div>
+
+                {/* Grid Column 3 */}
+                <div className="col-start-2 row-start-2 row-span-5" >
+                    <p className="font-bold"> Current:</p>
+                    <p> {formData.airTravelFootprint} tons</p>
+                    <p> {formData.groundTransportationFootprint} tons</p>
+                    <p> {formData.dietFootprint} tons</p>
+                    <p> {formData.totalCarbonFootprint} tons</p>
+                </div>
+
+                {/* Grid Column 3 */}
+                <div className="col-start-3 row-start-2 row-span-5" >
+                    <p className="font-bold"> Theoretical Best:</p>
+                    <p> {bestAirTravelFootprint} tons</p>
+                    <p> {bestGroundTransportationFootprint} tons</p>
+                    <p> {bestDietFootprint} tons</p>
+                    <p> {bestTotalCarbonFootprint} tons</p>
+                </div>
+
+                <div className="col-start-1 col-span-3 row-start-7 row-span-1">
+                    <p className="font-bold"> Theoretical Reduction: {formData.totalCarbonFootprint - bestTotalCarbonFootprint} tons</p>
+                </div>
+            </div>
+            <p style={{ marginBottom: "10px" }}>Want to share this survey? Use this link:</p>
+            <div className="flex items-center justify-center align-middle space-x-2"> {/* Updated flex settings */}
+                <input
+                    className="outer-box justify-center font-bold"
+                    style={{ width: "400px", marginTop: "0px" }}
+                    readOnly
+                    value={`${window.location.origin}/?rftg=${userTag}`}
+                />
+                <button
+                    className="p-2 bg-blue-500 text-white rounded"
+                    onClick={handleCopyClick}
+                >
+                    {copied ? 'Copied!' : 'Copy'}
+                </button>
+            </div>
+        </div>
+    );
+
+    !submitted ? (
         <form onSubmit={handleSubmit}>
             {pageNum == 0 ?
                 <FirstPage callback={nextPage} update={handleChange} data={formData} /> :
@@ -397,7 +454,62 @@ const SecondPage = ({ callback, update, data, errorMessages }: { callback: (e: R
 
 }
 
-const renderPage = ({structure, onChange}: FormRendererProps<{structure: FormPageComponents[]}>) => {
+const RenderPage = ({ structure, errorMessages, onChange, data }: FormRendererProps<{ structure: FormPageComponents[] } & { errorMessages: { [key: string]: any }, data: { [key: string]: any } }>) => {
+    return (<>{structure.map(([component, fields]: FormPageComponents, index) => {
+        switch (component) {
+            case "radio":
+                return <RadioGroup
+                    name={fields.name}
+                    question={fields.question}
+                    key={fields.name + index}
+                    options={fields.options}
+                    onChange={onChange} />
+            case "text":
+                return <OpenQuestion
+                    name={fields.name}
+                    question={fields.question}
+                    size={fields.size}
+                    key={fields.name + index}
+                    type={fields.type}
+                    value={data[fields.name]}
+                    step={fields.step}
+                    errorMessage={errorMessages[fields.name]}
+                    onChange={onChange} />
+            case "slider":
+                return <SliderQuestion
+                    name={fields.name}
+                    type={fields.type}
+                    key={fields.name + index}
+                    value={data[fields.name]}
+                    question={fields.question}
+                    range={fields.range}
+                    step={fields.step}
+                    onChange={onChange}
+                    disable={fields.disable} />
+            case "checkbox":
+                return <CheckboxGroup
+                    options={fields.options}
+                    name={fields.name}
+                    key={fields.name + index}
+                    question={fields.question}
+                    onChange={onChange}
+                />
+            case "page-break":
+
+                break;
+            case "label":
+
+                break;
+            case "cond-start":
+
+                break;
+            case "cond-end":
+
+                break;
+        }
+    })}<div>
+                            <button type="submit" className="calc-btn">Submit</button>
+                        </div></>)
 
 };
 
