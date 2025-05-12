@@ -18,7 +18,10 @@ const SurveyForm = ({
 
     const referrerTag = searchParams?.get('rftg') ?? "0";
 
-    
+    const [bestAirTravelFootprint, setBestAirTravelFootprint] = useState(0);
+    const [bestGroundTransportationFootprint, setBestGroundTransportationFootprint] = useState(0);
+    const [bestDietFootprint, setBestDietFootprint] = useState(0);
+    const [bestTotalCarbonFootprint, setBestTotalCarbonFootprint] = useState(0);
 
 
     // Handle form submission
@@ -42,6 +45,19 @@ const SurveyForm = ({
 
         if (response.ok) {
             console.log('Form submitted successfully');
+
+            // Calculate theoretical best values
+            let bestTotalCarbonFootprint = submissionData.totalCarbonFootprint - submissionData.airTravelFootprint - submissionData.groundTransportationFootprint - submissionData.dietFootprint;
+            const bestAirTravelFootprint = submissionData.airTravelFootprint * (1 - submissionData.airTravelLeisurePercentage/100);
+            const bestGroundTransportationFootprint = submissionData.groundTransportationFootprint * (1 - submissionData.replaceableDrivingByTransitPercentage/100);
+            const bestDietFootprint = submissionData.effortToBuyLocalFood == "yes" ? submissionData.dietFootprint * .94 : submissionData.dietFootprint;
+            bestTotalCarbonFootprint += bestAirTravelFootprint + bestGroundTransportationFootprint + bestDietFootprint;
+
+            // Set best values in state
+            setBestAirTravelFootprint(bestAirTravelFootprint);
+            setBestGroundTransportationFootprint(bestGroundTransportationFootprint);
+            setBestDietFootprint(bestDietFootprint);
+            setBestTotalCarbonFootprint(bestTotalCarbonFootprint);
             setSubmitted(true); // Set submitted to true to indicate form submission
             const data = await response.json();
             setUserTag(data.tag);
@@ -183,9 +199,42 @@ const SurveyForm = ({
                     </>)}
         </form>) : (
         <div className="text-center flex flex-col items-center">
-            <h2 className="text-2xl font-bold mb-4" style={{marginBottom:"5px"}}>Thank you for your submission!</h2>
+            <h2 className="text-2xl font-bold mb-4" style={{ marginBottom: "5px" }}>Thank you for your submission!</h2>
             <p>Your responses have been recorded.</p>
-            <p style={{marginBottom:"10px"}}>Want to share this survey? Use this link:</p>
+            <div className="outer-box grid! grid-cols-3 grid-rows-7 col-span-1">
+                <p className="row-start-1 row-span-1 col-start-1 col-span-3 font-bold"> Carbon Footprint Results </p>
+                {/* Grid Column 1 */}
+                <div className="col-start-1 row-start-2 row-span-5" >
+                    <p className="font-bold"> Footprint Categories</p>
+                    <p> Air Travel:</p>
+                    <p> Ground Transit:</p>
+                    <p> Diet:</p>
+                    <p> Total Footprint:</p>
+                </div>
+
+                {/* Grid Column 3 */}
+                <div className="col-start-2 row-start-2 row-span-5" >
+                    <p className="font-bold"> Current:</p>
+                    <p> {formData.airTravelFootprint} tons</p>
+                    <p> {formData.groundTransportationFootprint} tons</p>
+                    <p> {formData.dietFootprint} tons</p>
+                    <p> {formData.totalCarbonFootprint} tons</p>
+                </div>
+
+                {/* Grid Column 3 */}
+                <div className="col-start-3 row-start-2 row-span-5" >
+                    <p className="font-bold"> Theoretical Best:</p>
+                    <p> {bestAirTravelFootprint} tons</p>
+                    <p> {bestGroundTransportationFootprint} tons</p>
+                    <p> {bestDietFootprint} tons</p>
+                    <p> {bestTotalCarbonFootprint} tons</p>
+                </div>
+
+                <div className="col-start-1 col-span-3 row-start-7 row-span-1">
+                    <p className="font-bold"> Theoretical Reduction: {formData.totalCarbonFootprint - bestTotalCarbonFootprint} tons</p>
+                </div>
+            </div>
+            <p style={{ marginBottom: "10px" }}>Want to share this survey? Use this link:</p>
             <div className="flex items-center justify-center align-middle space-x-2"> {/* Updated flex settings */}
                 <input
                     className="outer-box justify-center font-bold"
@@ -210,18 +259,18 @@ const SurveyForm = ({
 // data is the current form values
 const FirstPage = ({ callback, update, data }: { callback: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void, update: (e: React.ChangeEvent<any> | EventSubmission) => void, data: { [key: string]: any } }) => {
     const [completed, setCompleted] = useState(false);
-    
+
     useEffect(() => {
         if (data.referredBy !== '' && data.referredBy &&
-            data.inclinationToChange !== '' && data.inclinationToChange 
-            && 
-            data.largestImpactChoice !== '' && data.largestImpactChoice ) {
-                setCompleted(true);
-        } else if (completed ){
+            data.inclinationToChange !== '' && data.inclinationToChange
+            &&
+            data.largestImpactChoice !== '' && data.largestImpactChoice) {
+            setCompleted(true);
+        } else if (completed) {
             setCompleted(false);
         }
     }, [data.referredBy, data.inclinationToChange, data.largestImpactChoice]);
-    
+
     return (<>
         {/* Referred By */}
         <RadioGroup
@@ -261,7 +310,7 @@ const FirstPage = ({ callback, update, data }: { callback: (e: React.MouseEvent<
 // update is the function for updating the form values
 // data is the current form values
 const SecondPage = ({ callback, update, data, errorMessages }: { callback: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void, update: (e: React.ChangeEvent<any> | EventSubmission) => void, data: { [key: string]: any }, errorMessages: { [key: string]: any } }) => {
-    
+
     return (<>
         <p className="outer-box">Go to this site and fill out the questions, then enter your results into the text boxes below:
             <Link className="font-bold inner-box box-content w-[270px]! text-blue-700!" href={"https://uba.co2-rechner.de/de_DE/quickcheck/"} rel="noopener noreferrer" target="_blank">Umwelt Bundesamt CO2 Rechner</Link>
@@ -344,8 +393,8 @@ const SecondPage = ({ callback, update, data, errorMessages }: { callback: (e: R
             errorMessage={errorMessages.otherConsumptionFootprint}
             onChange={update} />
         <div>
-        <button type="button" className="calc-btn"  onClick={callback}>{"Next" }</button>
-        {/* <button type="button" className={`${completed ? "calc-btn" : "px-4 py-2 bg-gray-600 text-white rounded"}`} onClick={callback} disabled={!completed}>{completed ? "Next" : "Fill out all Fields"}</button> */}
+            <button type="button" className="calc-btn" onClick={callback}>{"Next"}</button>
+            {/* <button type="button" className={`${completed ? "calc-btn" : "px-4 py-2 bg-gray-600 text-white rounded"}`} onClick={callback} disabled={!completed}>{completed ? "Next" : "Fill out all Fields"}</button> */}
         </div>
     </>)
 
