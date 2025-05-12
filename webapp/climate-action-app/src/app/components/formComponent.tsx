@@ -150,7 +150,6 @@ const SurveyForm = ({
                             name="effortToBuyLocalFood"
                             question="Do you make an effort to buy local food?"
                             options={options.effortToBuyLocalFoodOptions}
-                            value={formData.effortToBuyLocalFood}
                             onChange={handleChange} />
 
                         {/* Willing to Give Up */}
@@ -173,7 +172,6 @@ const SurveyForm = ({
 
                         {/* Willing to Engage With */}
                         <CheckboxGroup
-                            value={formData.willingToEngageOptions}
                             options={options.willingToEngageOptions}
                             name={"willingToEngageWith"}
                             question={"Would you be willing to engage with friends, family, or coworkers to reduce your climate impact?"}
@@ -277,7 +275,6 @@ const FirstPage = ({ callback, update, data }: { callback: (e: React.MouseEvent<
             name="referredBy"
             question="Who referred you to this survey?"
             options={options.referralOptions}
-            value={String(data.referredBy)}
             onChange={update} />
 
 
@@ -287,7 +284,6 @@ const FirstPage = ({ callback, update, data }: { callback: (e: React.MouseEvent<
             name="inclinationToChange"
             question="How inclined do you feel to change your lifestyle choices to be more sustainable?"
             options={options.inclinationOptions}
-            value={String(data.inclinationToChange)}
             onChange={update} />
 
         {/*Largest Impact Choice */}
@@ -295,7 +291,6 @@ const FirstPage = ({ callback, update, data }: { callback: (e: React.MouseEvent<
             name="largestImpactChoice"
             question="Which of your lifestyle choices do you think has the largest impact on the environment?"
             options={options.carbonFootprintCategories}
-            value={String(data.largestImpactChoice)}
             onChange={update} />
         <div>
             <button type="button" className={`${completed ? "calc-btn" : "px-4 py-2 bg-gray-600 text-white rounded"}`} onClick={callback} disabled={!completed}>{completed ? "Next" : "Fill out all Fields"}</button>

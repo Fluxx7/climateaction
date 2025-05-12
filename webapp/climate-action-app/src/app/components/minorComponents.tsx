@@ -21,7 +21,6 @@ export type CheckboxOption = {
 export interface BasicQuestionProps {
     name: string; // key for answer in formData
     question: string; // Question
-    value: string | string[]; // Currently selected value (passed in from formData)
     className?: string; //classes for outer component
     onChange: (e: React.ChangeEvent<any> | EventSubmission) => void;
 }
@@ -30,7 +29,6 @@ export interface BasicQuestionProps {
 // RadioGroup interface for rendering radio button groups
 // This is used for inclinationToChange, largestImpactChoice, and effortToBuyLocalFood
 interface RadioGroupProps extends BasicQuestionProps {
-    value: string;
     options: RadioOption[]; // Array of options for the radio buttons
 }
 
@@ -51,7 +49,6 @@ interface SliderQuestionProps extends BasicQuestionProps {
 }
 
 interface CheckboxGroupProps extends BasicQuestionProps {
-    value: string[];
     options: CheckboxOption[]; // Array of options for the radio buttons
 }
 
