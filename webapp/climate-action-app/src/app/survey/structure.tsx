@@ -1,22 +1,35 @@
 import { ReactElement } from "react";
-import { CheckboxGroupFields, CheckboxOption, InputQuestionFields, RadioGroupFields, RadioOption, SliderQuestionFields } from "../components/minorComponents";
+import { BasicQuestionFields, CheckboxGroupFields, CheckboxOption, InputQuestionFields, RadioGroupFields, RadioOption, SliderQuestionFields } from "../components/minorComponents";
 import Link from "next/link";
 
-
-
-export type FormPageComponents =
-    // question types
+export type FormQuestionComponent = 
+    // question components
     ["radio", RadioGroupFields] |
     ["checkbox", CheckboxGroupFields] |
-    ["slider", Omit<SliderQuestionFields, "value">] |
-    ["text", Omit<InputQuestionFields, "value"> & { error?: boolean }] |
+    ["slider", SliderQuestionFields] |
+    ["text", InputQuestionFields & { error?: boolean }];
+
+
+
+export type FormRenderComponent = 
+    FormQuestionComponent |
     // page components
-    ["page-break", {}] | 
+    ["page-start", {}] | 
+    ["next-button", {}] | 
+    ["end-button", {}] | 
     ["label", {label: string | ReactElement}] |
     ["cond-start", {name: string, dependsOn: string}] | 
     ["cond-end", {name: string}];
 
-const structure: FormPageComponents[] = [
+export const isFormQuestionComponent = (x: FormRenderComponent): x is FormQuestionComponent  => {
+    if (new Set(["radio", "checkbox", "slider", "text"]).has(x[0]))
+        return true
+    return false
+};
+
+const structure: FormRenderComponent[] = [
+    ["page-start", {}],
+
     // Referred by
     ["radio",
         {
@@ -63,7 +76,7 @@ const structure: FormPageComponents[] = [
         }
     ],
 
-    ["page-break", {}],
+    ["page-start", {}],
 
     // Link to Uba CO2 calc
     ["label",
@@ -154,7 +167,7 @@ const structure: FormPageComponents[] = [
         }
     ],
 
-    ["page-break", {}],
+    ["page-start", {}],
 
     // next two questions only appear if airTravelFootprint is above 0
     ["cond-start", {name: "airTravelCond", dependsOn: "airTravelFootprint"}],

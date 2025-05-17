@@ -33,7 +33,6 @@ export interface RadioGroupFields extends BasicQuestionFields {
 
 export interface InputQuestionFields extends BasicQuestionFields {
     size: string;
-    value: string;
     type?: string;
     errorMessage?: string;
     step?: number | string;
@@ -41,7 +40,6 @@ export interface InputQuestionFields extends BasicQuestionFields {
 
 export interface SliderQuestionFields extends BasicQuestionFields {
     type: string;
-    value: string;
     range?: [number | string, number | string];
     step?: number | string;
     disable?: string;
@@ -63,7 +61,7 @@ export const OpenQuestion = ({
     step,
     errorMessage,
     onChange
-}: FormRendererProps<InputQuestionFields>)=> {
+}: FormRendererProps<InputQuestionFields> & {value: string})=> {
     return (
         <div className={className + " outer-box"}>
             <legend className="carbon-footprint-question inner-box">{question}</legend>
@@ -150,7 +148,7 @@ export const RadioGroup = ({
 };
 
 // SliderQuestion component for rendering sliders
-export const SliderQuestion = (props: FormRendererProps<SliderQuestionFields>) => {
+export const SliderQuestion = (props: FormRendererProps<SliderQuestionFields> & {value: string}) => {
     const [disabled, setDisabled] = useState<boolean>(false);
 
     return (
