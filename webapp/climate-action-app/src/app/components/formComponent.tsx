@@ -178,10 +178,10 @@ const RenderPage = ({ structure, errorMessages, onChange, data }: FormRendererPr
 
         //if the end of structure has been reached, add a submit button
         if (index >= structure.length) {
-            newCurrentPage.push(["end-button", {}]);
+            newCurrentPage.push(["end-button"]);
         } else {
             // if there are more components (ie. more pages) in structure, add a next page button
-            newCurrentPage.push(["next-button", {}]);
+            newCurrentPage.push(["next-button"]);
         }
         setCurrentPage(newCurrentPage);
     }, [pageNum, structure]);
@@ -204,6 +204,7 @@ const RenderPage = ({ structure, errorMessages, onChange, data }: FormRendererPr
             case "radio":
                 return <RadioGroup
                     name={fields.name}
+                    value={data[fields.name]}
                     question={fields.question}
                     key={fields.name + index}
                     options={fields.options}
@@ -237,20 +238,20 @@ const RenderPage = ({ structure, errorMessages, onChange, data }: FormRendererPr
                 return <CheckboxGroup
                     options={fields.options}
                     name={fields.name}
+                    value={data[fields.name]}
                     key={fields.name + index + pageNum}
                     question={fields.question}
                     onChange={onChange}
                 />
 
             case "next-button":
-
-                return <div key={"next_button" + pageNum} className="flex gap-4">
+                return <div key={"next_button" + pageNum} className="flex gap-4 page-button-div">
                     {pageNum > 0 && <button type="button" className="calc-btn" onClick={() => setPageNum((currNum) => currNum - 1)}>Back</button>}
                     <button type="button" className={`${completed ? "calc-btn" : "px-4 py-2 bg-gray-600 text-white rounded"}`} onClick={() => setPageNum((currNum) => currNum + 1)} disabled={!completed}>{completed ? "Next" : "Fill out all Fields"}</button>
                 </div>
 
             case "end-button":
-                return <div key={"submit_button" + pageNum} className="flex gap-4">
+                return <div key={"submit_button" + pageNum} className="flex gap-4 page-button-div">
                     <button type="button" className="calc-btn" onClick={() => setPageNum((currNum) => currNum - 1)}>Back</button>
                     <button type="submit" className={`${completed ? "calc-btn" : "px-4 py-2 bg-gray-600 text-white rounded"}`}>{completed ? "Submit" : "Fill out all Fields"}</button>
                 </div>

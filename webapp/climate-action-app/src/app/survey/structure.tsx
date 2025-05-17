@@ -7,16 +7,16 @@ export type FormQuestionComponent =
     ["radio", RadioGroupFields] |
     ["checkbox", CheckboxGroupFields] |
     ["slider", SliderQuestionFields] |
-    ["text", InputQuestionFields & { error?: boolean }];
+    ["text", InputQuestionFields];
 
 
 
 export type FormRenderComponent = 
     FormQuestionComponent |
     // page components
-    ["page-start", {}] | 
-    ["next-button", {}] | 
-    ["end-button", {}] | 
+    ["page-start"] | 
+    ["next-button"] | 
+    ["end-button"] | 
     ["label", {label: string | ReactElement}] |
     ["cond-start", {name: string, dependsOn: string}] | 
     ["cond-end", {name: string}];
@@ -28,7 +28,7 @@ export const isFormQuestionComponent = (x: FormRenderComponent): x is FormQuesti
 };
 
 const structure: FormRenderComponent[] = [
-    ["page-start", {}],
+    ["page-start"],
 
     // Referred by
     ["radio",
@@ -76,7 +76,7 @@ const structure: FormRenderComponent[] = [
         }
     ],
 
-    ["page-start", {}],
+    ["page-start"],
 
     // Link to Uba CO2 calc
     ["label",
@@ -167,7 +167,7 @@ const structure: FormRenderComponent[] = [
         }
     ],
 
-    ["page-start", {}],
+    ["page-start"],
 
     // next two questions only appear if airTravelFootprint is above 0
     ["cond-start", {name: "airTravelCond", dependsOn: "airTravelFootprint"}],

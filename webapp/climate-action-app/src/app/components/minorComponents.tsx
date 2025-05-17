@@ -97,17 +97,27 @@ export const RadioGroup = ({
     question,
     className,
     options,
+    value, 
     onChange
-}: FormRendererProps<RadioGroupFields>) => {
-    const [selected, setSelected] = useState(""); // State to manage user signature
+}: FormRendererProps<RadioGroupFields> & {value: string | number | string[]}) => {
+    const [selected, setSelected] = useState(""); 
     const [target, setTarget] = useState<{name: string, value: string | number | string[], type: string}>();
 
-    // Manages the referral radio buttons
     useEffect(() => {
         if (typeof target !== "undefined") {
             onChange({target});
         }
     }, [selected, target, onChange]);
+
+    useEffect(() => {
+        if (typeof value !== "undefined" && value !== target?.value) {
+            if (typeof value === "string" && options.some((input) => input.value === value)) {
+                setSelected(value);
+            } else if (typeof value === "string") {
+
+            }
+        }
+    }, [value])
 
     return (
         <fieldset className={className + " outer-box "}>
@@ -134,7 +144,7 @@ export const RadioGroup = ({
                         type="text"
                         name={name}
                         disabled={selected !== option.value}
-                        onChange={e => setTarget({name: e.target.name, value: e.target.value, type: e.target.type})}
+                        onChange={e => setTarget({name: e.target.name, value: "other: " + e.target.value, type: e.target.type})}
                         className="border rounded-md p-2"
                         style={{
                             color: selected === option.value ? 'var(--text)' : 'gray',
@@ -185,7 +195,7 @@ export const SliderQuestion = (props: FormRendererProps<SliderQuestionFields> & 
 };
 
 // CheckboxGroup component for rendering checkbox questions
-export const CheckboxGroup = ({name, options, className, question, onChange}: FormRendererProps<CheckboxGroupFields>) => {
+export const CheckboxGroup = ({name, options, className, question, value, onChange}: FormRendererProps<CheckboxGroupFields> & {value: string[]}) => {
     const [currGroups, setGroups] = useState<string[]>([]);
     const [selected, setSelected] = useState<[value: string, groups: string[] | undefined][]>([]);
 
@@ -196,7 +206,19 @@ export const CheckboxGroup = ({name, options, className, question, onChange}: Fo
         onChange(output);
     }, [name, selected, onChange])
 
-    // Multi-select mutual exclusivity logic for willingToEngageWith 
+    useEffect(() => {
+        if (typeof value !== "undefined") {
+            let newSelected: [value: string, groups: string[] | undefined][] = [];
+            value.forEach((val) => { 
+                newSelected.push([val, options[options.findIndex((option) => option.value === val)].exclusion_groups]);
+            });
+            if (!selected.every((input, i) => input[0] === newSelected[i][0] && input[1] === newSelected[i][1])) {
+                setSelected(newSelected);
+            }
+        }
+    }, [])
+
+    // Multi-select mutual exclusivity logic
     const handleCheckboxChange = (input: string, checked: boolean, exclusion_groups: string[] | undefined) => {
         const current: [value: string, groups: string[] | undefined][] = [...selected];
 
@@ -207,7 +229,7 @@ export const CheckboxGroup = ({name, options, className, question, onChange}: Fo
             if (exclusion_groups?.length == 0) {
                 exclusion_groups.push("default");
             } 
-            updated.push([input, exclusion_groups]); // add the new value into 
+            updated.push([input, exclusion_groups]); // add the new value into updated
         } else {
             updated = current.filter((value) => value[0] !== input);
         }

@@ -122,7 +122,7 @@ fieldset input[type="text"] {
   margin-left: 5px;
 }
 
-button[type="submit"] {
+.page-button-div {
   margin-top: 20px;
 }
 
