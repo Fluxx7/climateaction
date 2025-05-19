@@ -9,7 +9,8 @@ export type FormQuestionComponent =
     ["slider", SliderQuestionFields] |
     ["text", InputQuestionFields];
 
-
+export type FormConditionComponent = 
+    ["cond-start", {name: string, dependency: {input: string, condition: (a: number) => boolean}}]
 
 export type FormRenderComponent = 
     FormQuestionComponent |
@@ -18,11 +19,17 @@ export type FormRenderComponent =
     ["next-button"] | 
     ["end-button"] | 
     ["label", {label: string | ReactElement}] |
-    ["cond-start", {name: string, dependsOn: string}] | 
+    FormConditionComponent | 
     ["cond-end", {name: string}];
 
 export const isFormQuestionComponent = (x: FormRenderComponent): x is FormQuestionComponent  => {
     if (new Set(["radio", "checkbox", "slider", "text"]).has(x[0]))
+        return true
+    return false
+};
+
+export const isFormConditionComponent = (x: FormRenderComponent): x is FormConditionComponent  => {
+    if (x[0] === "cond-start")
         return true
     return false
 };
@@ -41,8 +48,7 @@ const structure: FormRenderComponent[] = [
                 { value: "supervisorOrCoworker", label: "Supervisor/Coworkers" },
                 { value: "other", label: "Other: ", textValue: true },
                 { value: "prefNot", label: "Prefer not to say" }
-            ]
-            ,
+            ],
         }
     ],
 
@@ -170,7 +176,7 @@ const structure: FormRenderComponent[] = [
     ["page-start"],
 
     // next two questions only appear if airTravelFootprint is above 0
-    ["cond-start", {name: "airTravelCond", dependsOn: "airTravelFootprint"}],
+    ["cond-start", {name: "airTravelCond", dependency: {input: "airTravelFootprint", condition: (a: number) => {return a > 0}}}],
 
     // Air Travel Leisure Percentage
     ["slider",
@@ -181,7 +187,6 @@ const structure: FormRenderComponent[] = [
             range: ["0", "100"],
             step: "5",
         }
-
     ],
 
     // Goal to Reduce Air Travel

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { EventSubmission, useFormState } from "../survey/useFormState";
 import { RadioGroup, OpenQuestion, SliderQuestion, CheckboxGroup, FormRendererProps } from "./minorComponents";
 import { useSearchParams } from "next/navigation";
-import structure, { FormQuestionComponent, FormRenderComponent, isFormQuestionComponent } from "../survey/structure";
+import structure, { FormQuestionComponent, FormRenderComponent, isFormConditionComponent, isFormQuestionComponent } from "../survey/structure";
 
 
 const SurveyForm = ({
@@ -167,13 +167,27 @@ const RenderPage = ({ structure, errorMessages, onChange, data }: FormRendererPr
             return;
         }
 
+        let conditions: [string, string, (a: number) => boolean][] = [];
+
         // push every component after the located page-start and before the next page-start into currentPage
         let index = i + 1;
         while (index < structure.length && structure[index][0] != "page-start") {
-            newCurrentPage.push(structure[index]);
+            let current = structure[index]
+            
+            // check for conditions
+            if (isFormConditionComponent(current)) {
+                conditions.push([current[1].name, current[1].dependency.input, current[1].dependency.condition])
+            } else if (current[0] === "cond-end") {
+                conditions = conditions.filter((check) => check[0] !== current[1].name)
+            } else {
+                // if all conditions are satisfied, add the component to the render queue
+                if (conditions.every(([, input, condition]) => {
+                    return condition(data[input])
+                })) {
+                    newCurrentPage.push(current);
+                }
+            }
             index++;
-
-
         }
 
         //if the end of structure has been reached, add a submit button
