@@ -1,5 +1,5 @@
 import { ReactElement } from "react";
-import { BasicQuestionFields, CheckboxGroupFields, CheckboxOption, InputQuestionFields, RadioGroupFields, RadioOption, SliderQuestionFields } from "../components/minorComponents";
+import { CheckboxGroupFields, InputQuestionFields, RadioGroupFields, SliderQuestionFields } from "../components/minorComponents";
 import Link from "next/link";
 
 export type FormQuestionComponent = 

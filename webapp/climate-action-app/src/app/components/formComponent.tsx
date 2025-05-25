@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { EventSubmission, useFormState } from "../survey/useFormState";
+import { useFormState } from "../survey/useFormState";
 import { RadioGroup, OpenQuestion, SliderQuestion, CheckboxGroup, FormRendererProps } from "./minorComponents";
 import { useSearchParams } from "next/navigation";
-import structure, { FormQuestionComponent, FormRenderComponent, isFormConditionComponent, isFormQuestionComponent } from "../survey/structure";
+import structure, { FormRenderComponent, isFormConditionComponent, isFormQuestionComponent } from "../survey/structure";
 
 
 const SurveyForm = ({
@@ -12,7 +12,6 @@ const SurveyForm = ({
     const [userTag, setUserTag] = useState("");
     const searchParams = useSearchParams();
     const [copied, setCopied] = useState(false);
-    const [pageNum, setPageNum] = useState(0);
     const [submitted, setSubmitted] = useState(false); // State to manage form submission
 
     const referrerTag = searchParams?.get('rftg') ?? "0";
@@ -148,7 +147,7 @@ const RenderPage = ({ structure, errorMessages, onChange, data }: FormRendererPr
 
     // sets currentPage to contain the components defined between the appropriate page-start and the page-start after that within structure
     useEffect(() => {
-        let newCurrentPage: FormRenderComponent[] = []
+        const newCurrentPage: FormRenderComponent[] = []
 
         // find the index of the correct page-start
         let scanNum = 0;
@@ -172,7 +171,7 @@ const RenderPage = ({ structure, errorMessages, onChange, data }: FormRendererPr
         // push every component after the located page-start and before the next page-start into currentPage
         let index = i + 1;
         while (index < structure.length && structure[index][0] != "page-start") {
-            let current = structure[index]
+            const current = structure[index]
             
             // check for conditions
             if (isFormConditionComponent(current)) {

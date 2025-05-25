@@ -208,7 +208,7 @@ export const CheckboxGroup = ({name, options, className, question, value, onChan
 
     useEffect(() => {
         if (typeof value !== "undefined") {
-            let newSelected: [value: string, groups: string[] | undefined][] = [];
+            const newSelected: [value: string, groups: string[] | undefined][] = [];
             value.forEach((val) => { 
                 newSelected.push([val, options[options.findIndex((option) => option.value === val)].exclusion_groups]);
             });
